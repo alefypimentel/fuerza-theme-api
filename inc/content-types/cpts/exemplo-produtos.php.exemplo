@@ -1,0 +1,98 @@
+<?php
+/**
+ * Exemplo: Custom Post Type - Produtos
+ * 
+ * Para usar este exemplo:
+ * 1. Renomeie o arquivo removendo ".exemplo"
+ * 2. Customize conforme necessário
+ * 3. O CPT será automaticamente registrado
+ * 
+ * @package MeuTemaAPI
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Registrar CPT de Produtos usando o sistema dinâmico
+Content_Manager::register_cpt('produto', [
+    'singular_name' => 'Produto',
+    'plural_name' => 'Produtos',
+    'description' => 'Catálogo de produtos do site',
+    'public' => true,
+    'show_in_rest' => true,
+    'rest_base' => 'produto',
+    'supports' => [
+        'title',
+        'editor',
+        'thumbnail',
+        'excerpt',
+        'page-attributes'
+    ],
+    'has_archive' => true,
+    'rewrite' => [
+        'slug' => 'produto',
+        'with_front' => false,
+    ],
+    'menu_icon' => 'dashicons-products',
+    'menu_position' => 25,
+    'hierarchical' => false,
+    
+    // Colunas administrativas personalizadas
+    'admin_columns' => [
+        'produto_preco' => [
+            'title' => 'Preço',
+            'callback' => function($column, $post_id) {
+                if ($column === 'produto_preco') {
+                    // Exemplo usando ACF
+                    if (function_exists('get_field')) {
+                        $preco = get_field('preco', $post_id);
+                        if ($preco) {
+                            echo 'R$ ' . number_format($preco, 2, ',', '.');
+                            return;
+                        }
+                    }
+                    echo '—';
+                }
+            }
+        ],
+        'produto_categoria' => [
+            'title' => 'Categoria',
+            'callback' => function($column, $post_id) {
+                if ($column === 'produto_categoria') {
+                    $categories = get_the_terms($post_id, 'categoria_produto');
+                    if ($categories && !is_wp_error($categories)) {
+                        echo esc_html($categories[0]->name);
+                    } else {
+                        echo '—';
+                    }
+                }
+            }
+        ]
+    ],
+    
+    // Hooks personalizados
+    'hooks' => [
+        'save_post_produto' => function($post_id) {
+            // Lógica executada quando um produto é salvo
+            // Ex: atualizar índice de busca, limpar cache, etc.
+        }
+    ]
+]);
+
+// ============================================================================
+// Método alternativo usando a função utilitária para CPTs simples:
+// ============================================================================
+
+/*
+Content_Manager::create_simple_cpt(
+    'produto',                    // Post type
+    'Produto',                   // Nome singular
+    'Produtos',                  // Nome plural
+    [                           // Opções adicionais (opcional)
+        'menu_icon' => 'dashicons-products',
+        'menu_position' => 25,
+        'supports' => ['title', 'editor', 'thumbnail', 'excerpt'],
+    ]
+);
+*/

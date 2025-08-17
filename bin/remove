@@ -1,0 +1,16 @@
+#!/bin/bash
+# 
+# Script wrapper para remoção de CPTs e Taxonomias
+# 
+# Uso: ./bin/remove <nome> [opções]
+# 
+
+# Verificar se está no diretório correto do tema
+if [ ! -f "bin/remove-content-type.php" ]; then
+    echo "❌ Erro: Execute este script a partir do diretório raiz do tema."
+    echo "Exemplo: cd wp-content/themes/fuerza-theme-api && ./bin/remove produto"
+    exit 1
+fi
+
+# Executar o script PHP
+php bin/remove-content-type.php "$@"

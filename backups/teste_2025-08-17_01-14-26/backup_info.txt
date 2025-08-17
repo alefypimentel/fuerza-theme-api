@@ -1,0 +1,9 @@
+Backup do Content Type: teste
+Data: 2025-08-17 01:14:26
+Comando executado: bin/remove-content-type.php teste --with-backup
+Arquivos incluídos:
+- cpt: teste.php
+- taxonomy: categoria_teste.php
+- api_formatter: class-teste-formatter.php
+- api_handler: class-teste-handler.php
+- api_routes: teste-routes.php

@@ -1,0 +1,16 @@
+#!/bin/bash
+# 
+# Script wrapper para geração de CPTs e Taxonomias
+# 
+# Uso: ./bin/generate <nome> [opções]
+# 
+
+# Verificar se está no diretório correto do tema
+if [ ! -f "bin/generate-content-type.php" ]; then
+    echo "❌ Erro: Execute este script a partir do diretório raiz do tema."
+    echo "Exemplo: cd wp-content/themes/meu-tema-api && ./bin/generate produto"
+    exit 1
+fi
+
+# Executar o script PHP
+php bin/generate-content-type.php "$@"

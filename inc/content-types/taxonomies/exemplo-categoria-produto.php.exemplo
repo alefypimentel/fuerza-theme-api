@@ -1,0 +1,81 @@
+<?php
+/**
+ * Exemplo: Taxonomia - Categoria de Produtos
+ * 
+ * Para usar este exemplo:
+ * 1. Renomeie o arquivo removendo ".exemplo"
+ * 2. Customize conforme necessário
+ * 3. A taxonomia será automaticamente registrada
+ * 
+ * @package MeuTemaAPI
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Registrar Taxonomia de Categoria de Produtos usando o sistema dinâmico
+Content_Manager::register_taxonomy('categoria_produto', ['produto'], [
+    'singular_name' => 'Categoria de Produto',
+    'plural_name' => 'Categorias de Produtos',
+    'description' => 'Categorias para organizar produtos',
+    'hierarchical' => true,
+    'public' => true,
+    'show_in_rest' => true,
+    'rest_base' => 'categoria_produto',
+    'show_admin_column' => true,
+    'rewrite' => [
+        'slug' => 'categoria-produto',
+        'hierarchical' => true,
+    ],
+    
+    // Campos meta personalizados para termos
+    'term_meta_fields' => [
+        [
+            'key' => 'categoria_desconto',
+            'label' => 'Desconto da Categoria (%)',
+            'type' => 'number',
+            'description' => 'Desconto aplicado a todos os produtos desta categoria'
+        ],
+        [
+            'key' => 'categoria_imagem',
+            'label' => 'Imagem da Categoria',
+            'type' => 'url',
+            'description' => 'URL da imagem representativa da categoria'
+        ]
+    ],
+    
+    // Colunas administrativas personalizadas
+    'admin_columns' => [
+        'categoria_desconto' => [
+            'title' => 'Desconto',
+            'callback' => function($content, $column, $term_id) {
+                if ($column === 'categoria_desconto') {
+                    $desconto = get_term_meta($term_id, 'categoria_desconto', true);
+                    if ($desconto) {
+                        return esc_html($desconto) . '%';
+                    }
+                    return '—';
+                }
+                return $content;
+            }
+        ]
+    ]
+]);
+
+// ============================================================================
+// Método alternativo usando a função utilitária para taxonomias simples:
+// ============================================================================
+
+/*
+Content_Manager::create_simple_taxonomy(
+    'categoria_produto',         // Taxonomia
+    ['produto'],                // Post types associados
+    'Categoria de Produto',     // Nome singular
+    'Categorias de Produtos',   // Nome plural
+    [                          // Opções adicionais (opcional)
+        'hierarchical' => true,
+        'show_admin_column' => true,
+    ]
+);
+*/
