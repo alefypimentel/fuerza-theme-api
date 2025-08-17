@@ -1,0 +1,101 @@
+# Portuguese (Brazil) translation for Fuerza Theme
+msgid ""
+msgstr ""
+"Project-Id-Version: Fuerza Theme API\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-17 21:00:00+0000\n"
+"PO-Revision-Date: 2025-08-17 21:00:00+0000\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# CPT Labels
+msgid "Add New"
+msgstr "Adicionar Novo"
+
+msgid "Add New %s"
+msgstr "Adicionar Novo %s"
+
+msgid "New %s"
+msgstr "Novo %s"
+
+msgid "Edit %s"
+msgstr "Editar %s"
+
+msgid "View %s"
+msgstr "Ver %s"
+
+msgid "All %s"
+msgstr "Todos os %s"
+
+msgid "Search %s"
+msgstr "Buscar %s"
+
+msgid "%s Parent:"
+msgstr "%s Pai:"
+
+msgid "No %s found."
+msgstr "Nenhum %s encontrado."
+
+msgid "No %s found in Trash."
+msgstr "Nenhum %s encontrado na lixeira."
+
+msgid "Featured Image"
+msgstr "Imagem Destacada"
+
+msgid "Set Featured Image"
+msgstr "Definir Imagem Destacada"
+
+msgid "Remove Featured Image"
+msgstr "Remover Imagem Destacada"
+
+msgid "Use as Featured Image"
+msgstr "Usar como Imagem Destacada"
+
+msgid "%s Archives"
+msgstr "Arquivo de %s"
+
+msgid "Insert into %s"
+msgstr "Inserir no %s"
+
+msgid "Uploaded to this %s"
+msgstr "Enviado para este %s"
+
+msgid "Filter %s list"
+msgstr "Filtrar lista de %s"
+
+msgid "%s list navigation"
+msgstr "Navegação da lista de %s"
+
+msgid "%s list"
+msgstr "Lista de %s"
+
+# Taxonomy Labels
+msgid "Parent %s"
+msgstr "%s Pai"
+
+msgid "Parent %s:"
+msgstr "%s Pai:"
+
+msgid "Popular %s"
+msgstr "%s Populares"
+
+msgid "Separate %s with commas"
+msgstr "Separar %s com vírgulas"
+
+msgid "Add or remove %s"
+msgstr "Adicionar ou remover %s"
+
+msgid "Choose from most used %s"
+msgstr "Escolher dos %s mais usados"
+
+msgid "No %s"
+msgstr "Nenhum %s"
+
+msgid "New %s Name"
+msgstr "Nome do Novo %s"
+
+msgid "Update %s"
+msgstr "Atualizar %s"

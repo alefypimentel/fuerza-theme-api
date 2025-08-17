@@ -1,24 +1,24 @@
 #!/usr/bin/env php
 <?php
 /**
- * Gerador de CPTs e Taxonomias
+ * CPTs and Taxonomies Generator
  * 
- * Script para gerar automaticamente Custom Post Types e Taxonomias
+ * Script to automatically generate Custom Post Types and Taxonomies
  * 
- * Uso:
- * php bin/generate-content-type.php <nome> [opções]
+ * Usage:
+ * php bin/generate-content-type.php <name> [options]
  * 
- * Exemplos:
- * php bin/generate-content-type.php produto
- * php bin/generate-content-type.php evento --with-taxonomy
- * php bin/generate-content-type.php noticia --singular="Notícia" --plural="Notícias"
+ * Examples:
+ * php bin/generate-content-type.php product
+ * php bin/generate-content-type.php event --with-taxonomy
+ * php bin/generate-content-type.php news --singular="News" --plural="News"
  * 
  * @package FuerzaThemeAPI
  */
 
-// Verificar se está sendo executado via CLI
+// Check if running via CLI
 if (php_sapi_name() !== 'cli') {
-    die("Este script deve ser executado via linha de comando.\n");
+    die("This script must be run via command line.\n");
 }
 
 class ContentTypeGenerator {
@@ -46,43 +46,43 @@ class ContentTypeGenerator {
     }
     
     /**
-     * Executar o gerador
+     * Run the generator
      */
     private function run() {
         $this->printHeader();
         
         try {
-            // Verificar se os diretórios existem
+            // Check if directories exist
             $this->ensureDirectoriesExist();
             
-            // Gerar CPT
+            // Generate CPT
             if (!isset($this->options['taxonomy-only'])) {
                 $this->generateCPT();
-                $this->success("✅ CPT '{$this->name}' criado com sucesso!");
+                $this->success("✅ CPT '{$this->name}' created successfully!");
             }
             
-            // Gerar taxonomia se solicitado
+            // Generate taxonomy if requested
             if (isset($this->options['with-taxonomy']) || isset($this->options['taxonomy-only'])) {
                 $this->generateTaxonomy();
-                $this->success("✅ Taxonomia 'categoria_{$this->name}' criada com sucesso!");
+                $this->success("✅ Taxonomy 'categoria_{$this->name}' created successfully!");
             }
             
-            // Gerar rotas da API se solicitado
+            // Generate API routes if requested
             if (isset($this->options['with-api']) && !isset($this->options['taxonomy-only'])) {
                 $this->generateAPIFiles();
-                $this->success("✅ Arquivos da API criados com sucesso!");
+                $this->success("✅ API files created successfully!");
             }
             
             $this->printSummary();
             
         } catch (Exception $e) {
-            $this->error("❌ Erro: " . $e->getMessage());
+            $this->error("❌ Error: " . $e->getMessage());
             exit(1);
         }
     }
     
     /**
-     * Analisar argumentos da linha de comando
+     * Parse command line arguments
      */
     private function parseArguments() {
         global $argv;
@@ -111,7 +111,7 @@ class ContentTypeGenerator {
     }
     
     /**
-     * Garantir que os diretórios existem
+     * Ensure directories exist
      */
     private function ensureDirectoriesExist() {
         $dirs = [
@@ -125,51 +125,51 @@ class ContentTypeGenerator {
         foreach ($dirs as $dir) {
             if (!is_dir($dir)) {
                 if (!mkdir($dir, 0755, true)) {
-                    throw new Exception("Não foi possível criar o diretório: {$dir}");
+                    throw new Exception("Could not create directory: {$dir}");
                 }
             }
         }
     }
     
     /**
-     * Gerar CPT
+     * Generate CPT
      */
     private function generateCPT() {
         $filename = $this->theme_path . "/inc/content-types/cpts/{$this->name}.php";
         
         if (file_exists($filename) && !isset($this->options['force'])) {
-            throw new Exception("CPT '{$this->name}' já existe. Use --force para sobrescrever.");
+            throw new Exception("CPT '{$this->name}' already exists. Use --force to overwrite.");
         }
         
         $template = $this->getCPTTemplate();
         $content = $this->replacePlaceholders($template);
         
         if (file_put_contents($filename, $content) === false) {
-            throw new Exception("Não foi possível criar o arquivo: {$filename}");
+            throw new Exception("Could not create file: {$filename}");
         }
     }
     
     /**
-     * Gerar taxonomia
+     * Generate taxonomy
      */
     private function generateTaxonomy() {
         $taxonomy_name = "categoria_{$this->name}";
         $filename = $this->theme_path . "/inc/content-types/taxonomies/{$taxonomy_name}.php";
         
         if (file_exists($filename) && !isset($this->options['force'])) {
-            throw new Exception("Taxonomia '{$taxonomy_name}' já existe. Use --force para sobrescrever.");
+            throw new Exception("Taxonomia '{$taxonomy_name}' already exists. Use --force to overwrite.");
         }
         
         $template = $this->getTaxonomyTemplate();
         $content = $this->replacePlaceholders($template);
         
         if (file_put_contents($filename, $content) === false) {
-            throw new Exception("Não foi possível criar o arquivo: {$filename}");
+            throw new Exception("Could not create file: {$filename}");
         }
     }
     
     /**
-     * Gerar arquivos da API
+     * Generate API files
      */
     private function generateAPIFiles() {
         // Formatter
@@ -198,7 +198,7 @@ class ContentTypeGenerator {
     }
     
     /**
-     * Substituir placeholders nos templates
+     * Replace placeholders in templates
      */
     private function replacePlaceholders($template) {
         $replacements = [
@@ -217,14 +217,14 @@ class ContentTypeGenerator {
     }
     
     /**
-     * Template do CPT
+     * CPT Template
      */
     private function getCPTTemplate() {
         return '<?php
 /**
  * Custom Post Type: {{PLURAL_UPPER}}
  * 
- * Gerado automaticamente em {{DATE}}
+ * Auto-generated on {{DATE}}
  * 
  * @package FuerzaThemeAPI
  */
@@ -233,11 +233,11 @@ if (!defined(\'ABSPATH\')) {
     exit;
 }
 
-// Registrar CPT de {{PLURAL_UPPER}} usando o sistema dinâmico
+// Register CPT for {{PLURAL_UPPER}} using the dynamic system
 Content_Manager::register_cpt(\'{{NAME}}\', [
     \'singular_name\' => \'{{SINGULAR_UPPER}}\',
     \'plural_name\' => \'{{PLURAL_UPPER}}\',
-    \'description\' => \'Gerenciar {{PLURAL}} do site\',
+    \'description\' => \'Manage site\',
     \'public\' => true,
     \'show_in_rest\' => true,
     \'rest_base\' => \'{{NAME}}\',
@@ -262,7 +262,7 @@ Content_Manager::register_cpt(\'{{NAME}}\', [
     \'capability_type\' => \'post\',
     \'map_meta_cap\' => true,
     
-    // Configurações administrativas personalizadas
+    // Custom administrative settings
     \'admin_columns\' => [
         \'{{NAME}}_status\' => [
             \'title\' => \'Status\',
@@ -274,36 +274,36 @@ Content_Manager::register_cpt(\'{{NAME}}\', [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     \'hooks\' => [
         \'save_post_{{NAME}}\' => function($post_id) {
-            // Lógica executada quando um {{SINGULAR}} é salvo
+            // Logic executed when um {{SINGULAR}} is saved
             if (function_exists(\'wp_cache_delete\')) {
                 wp_cache_delete(\'{{NAME}}_list\', \'fuerza_theme\');
             }
         }
     ],
     
-    // Labels personalizados específicos
+    // Specific custom labels
     \'labels\' => [
-        \'featured_image\' => \'Imagem do {{SINGULAR_UPPER}}\',
-        \'set_featured_image\' => \'Definir imagem do {{SINGULAR}}\',
-        \'remove_featured_image\' => \'Remover imagem do {{SINGULAR}}\',
-        \'use_featured_image\' => \'Usar como imagem do {{SINGULAR}}\',
+        \'featured_image\' => \'Image for {{SINGULAR_UPPER}}\',
+        \'set_featured_image\' => \'Set image for {{SINGULAR}}\',
+        \'remove_featured_image\' => \'Remove image for {{SINGULAR}}\',
+        \'use_featured_image\' => \'Use as image for {{SINGULAR}}\',
     ]
 ]);
 ';
     }
     
     /**
-     * Template da taxonomia
+     * Taxonomy Template
      */
     private function getTaxonomyTemplate() {
         return '<?php
 /**
  * Taxonomia: Categoria de {{PLURAL_UPPER}}
  * 
- * Gerado automaticamente em {{DATE}}
+ * Auto-generated on {{DATE}}
  * 
  * @package FuerzaThemeAPI
  */
@@ -312,11 +312,11 @@ if (!defined(\'ABSPATH\')) {
     exit;
 }
 
-// Registrar Taxonomia de Categoria de {{PLURAL_UPPER}} usando o sistema dinâmico
+// Register Category Taxonomy for {{PLURAL_UPPER}} using the dynamic system
 Content_Manager::register_taxonomy(\'{{TAXONOMY_NAME}}\', [\'{{NAME}}\'], [
     \'singular_name\' => \'Categoria de {{SINGULAR_UPPER}}\',
     \'plural_name\' => \'Categorias de {{PLURAL_UPPER}}\',
-    \'description\' => \'Categorias para organizar {{PLURAL}}\',
+    \'description\' => \'Categories to organize {{PLURAL}}\',
     \'hierarchical\' => true,
     \'public\' => true,
     \'show_in_rest\' => true,
@@ -334,27 +334,27 @@ Content_Manager::register_taxonomy(\'{{TAXONOMY_NAME}}\', [\'{{NAME}}\'], [
         \'hierarchical\' => true,
     ],
     
-    // Campos meta personalizados para termos
+    // Custom meta fields for terms
     \'term_meta_fields\' => [
         [
             \'key\' => \'categoria_cor\',
-            \'label\' => \'Cor da Categoria\',
+            \'label\' => \'Category Color\',
             \'type\' => \'color\',
-            \'description\' => \'Cor que representa esta categoria\'
+            \'description\' => \'Color that represents this category\'
         ],
         [
             \'key\' => \'categoria_destaque\',
-            \'label\' => \'Categoria em Destaque\',
+            \'label\' => \'Featured Category\',
             \'type\' => \'select\',
             \'options\' => [
                 \'nao\' => \'Não\',
                 \'sim\' => \'Sim\'
             ],
-            \'description\' => \'Marcar como categoria em destaque\'
+            \'description\' => \'Mark as featured category\'
         ]
     ],
     
-    // Colunas administrativas personalizadas
+    // Custom administrative columns
     \'admin_columns\' => [
         \'categoria_cor\' => [
             \'title\' => \'Cor\',
@@ -371,7 +371,7 @@ Content_Manager::register_taxonomy(\'{{TAXONOMY_NAME}}\', [\'{{NAME}}\'], [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     \'hooks\' => [
         \'created_{{TAXONOMY_NAME}}\' => function($term_id) {
             if (function_exists(\'wp_cache_delete\')) {
@@ -384,14 +384,14 @@ Content_Manager::register_taxonomy(\'{{TAXONOMY_NAME}}\', [\'{{NAME}}\'], [
     }
     
     /**
-     * Template do formatter
+     * Formatter Template
      */
     private function getFormatterTemplate() {
         return '<?php
 /**
- * Formatador para dados de {{PLURAL}}
+ * Formatter for data of {{PLURAL}}
  * 
- * Gerado automaticamente em {{DATE}}
+ * Auto-generated on {{DATE}}
  * 
  * @package FuerzaThemeAPI
  */
@@ -415,10 +415,10 @@ class {{CLASS_NAME}}_Formatter extends Base_Formatter {
             $post_id = get_the_ID();
         }
         
-        // Dados básicos do post
+        // Basic post data
         ${{NAME}} = self::format_basic_post_data($post_id);
         
-        // Adicionar dados específicos
+        // Add specific data
         ${{NAME}}[\'imagem_destacada\'] = self::format_featured_image($post_id);
         ${{NAME}}[\'autor\'] = self::format_author($post_id);
         ${{NAME}}[\'categorias\'] = self::format_{{NAME}}_categories($post_id);
@@ -432,7 +432,7 @@ class {{CLASS_NAME}}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar categorias específicas
+     * Format specific categories
      */
     public static function format_{{NAME}}_categories($post_id) {
         $taxonomies = [\'{{TAXONOMY_NAME}}\', \'category\'];
@@ -440,7 +440,7 @@ class {{CLASS_NAME}}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar múltiplos {{PLURAL}}
+     * Format multiple {{PLURAL}}
      */
     public static function format_{{PLURAL}}($posts) {
         ${{PLURAL}} = [];
@@ -453,7 +453,7 @@ class {{CLASS_NAME}}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar resposta de paginação
+     * Format pagination response
      */
     public static function format_pagination($query, $page, $per_page) {
         return [
@@ -470,14 +470,14 @@ class {{CLASS_NAME}}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Template do handler
+     * Handler Template
      */
     private function getHandlerTemplate() {
         return '<?php
 /**
- * Manipulador para rotas de {{PLURAL}}
+ * Handler for routes of {{PLURAL}}
  * 
- * Gerado automaticamente em {{DATE}}
+ * Auto-generated on {{DATE}}
  * 
  * @package FuerzaThemeAPI
  */
@@ -550,7 +550,7 @@ class {{CLASS_NAME}}_Handler {
         if (!$post || $post->post_type !== \'{{NAME}}\' || $post->post_status !== \'publish\') {
             return new WP_Error(
                 \'{{NAME}}_not_found\',
-                \'{{SINGULAR_UPPER}} não encontrado.\',
+                \'{{SINGULAR_UPPER}} not found.\',
                 [\'status\' => 404]
             );
         }
@@ -559,7 +559,7 @@ class {{CLASS_NAME}}_Handler {
     }
     
     /**
-     * Validar parâmetros da requisição
+     * Validate request parameters
      */
     public static function validate_{{PLURAL}}_params() {
         return [
@@ -592,7 +592,7 @@ class {{CLASS_NAME}}_Handler {
     }
     
     /**
-     * Validar parâmetros de {{SINGULAR}} específico
+     * Validate specific.*parameters
      */
     public static function validate_{{NAME}}_params() {
         return [
@@ -610,14 +610,14 @@ class {{CLASS_NAME}}_Handler {
     }
     
     /**
-     * Template das rotas
+     * Routes Template
      */
     private function getRoutesTemplate() {
         return '<?php
 /**
- * Rotas da API para {{PLURAL}}
+ * API Routes for {{PLURAL}}
  * 
- * Gerado automaticamente em {{DATE}}
+ * Auto-generated on {{DATE}}
  * 
  * @package FuerzaThemeAPI
  */
@@ -650,7 +650,7 @@ $api_manager->add_route(
     }
     
     /**
-     * Utilitários
+     * Utilities
      */
     private function sanitizeName($name) {
         return strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
@@ -672,7 +672,7 @@ $api_manager->add_route(
     }
     
     /**
-     * Interface do usuário
+     * User Interface
      */
     private function printHeader() {
         echo "\n";
@@ -690,20 +690,20 @@ $api_manager->add_route(
         echo "----------\n";
         
         if (!isset($this->options['taxonomy-only'])) {
-            echo "✅ CPT criado em: inc/content-types/cpts/{$this->name}.php\n";
+            echo "✅ CPT created at: inc/content-types/cpts/{$this->name}.php\n";
         }
         
         if (isset($this->options['with-taxonomy']) || isset($this->options['taxonomy-only'])) {
-            echo "✅ Taxonomia criada em: inc/content-types/taxonomies/categoria_{$this->name}.php\n";
+            echo "✅ Taxonomy created at: inc/content-types/taxonomies/categoria_{$this->name}.php\n";
         }
         
         if (isset($this->options['with-api']) && !isset($this->options['taxonomy-only'])) {
-            echo "✅ API criada em: inc/api/routes/{$this->name}-routes.php\n";
+            echo "✅ API created at: inc/api/routes/{$this->name}-routes.php\n";
             echo "📡 Endpoint: /wp-json/meu-tema/v1/{$this->plural}\n";
         }
         
-        echo "\n🎉 Pronto! Seus arquivos foram gerados com sucesso!\n";
-        echo "💡 Dica: Execute 'wp rewrite flush' se necessário.\n\n";
+        echo "\n🎉 Done! Your files were generated successfully!\n";
+        echo "💡 Dica: Run wp rewrite flush if necessary.\n\n";
     }
     
     private function success($message) {
@@ -722,13 +722,13 @@ $api_manager->add_route(
         echo "Argumentos:\n";
         echo "  <nome>                    Nome do CPT (obrigatório)\n\n";
         echo "Opções:\n";
-        echo "  --singular=<nome>         Nome singular personalizado\n";
-        echo "  --plural=<nome>           Nome plural personalizado\n";
-        echo "  --with-taxonomy           Criar taxonomia junto com o CPT\n";
-        echo "  --taxonomy-only           Criar apenas a taxonomia\n";
-        echo "  --with-api                Criar arquivos da API REST\n";
-        echo "  --force                   Sobrescrever arquivos existentes\n";
-        echo "  --help                    Mostrar esta ajuda\n\n";
+        echo "  --singular=<nome>         Custom singular name\n";
+        echo "  --plural=<nome>           Custom plural name\n";
+        echo "  --with-taxonomy           Create taxonomy along with CPT\n";
+        echo "  --taxonomy-only           Create taxonomy only\n";
+        echo "  --with-api                Create REST API files\n";
+        echo "  --force                   Overwrite existing files\n";
+        echo "  --help                    Show this help\n\n";
         echo "Exemplos:\n";
         echo "  php bin/generate-content-type.php produto\n";
         echo "  php bin/generate-content-type.php evento --with-taxonomy\n";

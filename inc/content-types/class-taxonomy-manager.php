@@ -1,6 +1,6 @@
 <?php
 /**
- * Gerenciador dinâmico de Taxonomias
+ * Dynamic Taxonomies Manager
  * 
  * @package FuerzaThemeAPI
  */
@@ -12,17 +12,17 @@ if (!defined('ABSPATH')) {
 class Taxonomy_Manager {
     
     /**
-     * Lista de taxonomias registradas
+     * List of registered taxonomies
      */
     private static $registered_taxonomies = [];
     
     /**
-     * Instância singleton
+     * Singleton instance
      */
     private static $instance = null;
     
     /**
-     * Obtém instância singleton
+     * Get singleton instance
      */
     public static function get_instance() {
         if (self::$instance === null) {
@@ -32,7 +32,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Construtor privado
+     * Private constructor
      */
     private function __construct() {
         add_action('init', [$this, 'register_all_taxonomies']);
@@ -40,7 +40,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Carrega todas as definições de taxonomias
+     * Load all taxonomy definitions
      */
     private function load_taxonomy_definitions() {
         $taxonomies_dir = get_template_directory() . '/inc/content-types/taxonomies/';
@@ -57,7 +57,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Registra uma nova taxonomia
+     * Register a new taxonomy
      */
     public static function register_taxonomy($taxonomy, $post_types, $config) {
         self::$registered_taxonomies[$taxonomy] = [
@@ -67,7 +67,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Registra todas as taxonomias no WordPress
+     * Register all taxonomies in WordPress
      */
     public function register_all_taxonomies() {
         foreach (self::$registered_taxonomies as $taxonomy => $data) {
@@ -76,10 +76,10 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Registra uma taxonomia individual
+     * Register individual taxonomy
      */
     private function register_single_taxonomy($taxonomy, $post_types, $config) {
-        // Configurações padrão
+        // Default settings
         $defaults = [
             'labels' => $this->generate_labels($taxonomy, $config),
             'public' => true,
@@ -97,18 +97,18 @@ class Taxonomy_Manager {
             'rewrite' => ['slug' => $taxonomy],
         ];
         
-        // Mesclar configurações
+        // Merge settings
         $args = wp_parse_args($config, $defaults);
         
-        // Registrar a taxonomia
+        // Register the taxonomy
         register_taxonomy($taxonomy, $post_types, $args);
         
-        // Aplicar configurações adicionais se especificadas
+        // Apply additional configurations if specified
         $this->apply_additional_configs($taxonomy, $config);
     }
     
     /**
-     * Gera labels automaticamente
+     * Generate labels automatically
      */
     private function generate_labels($taxonomy, $config) {
         $singular = $config['singular_name'] ?? ucfirst($taxonomy);
@@ -118,26 +118,26 @@ class Taxonomy_Manager {
             'name' => $plural,
             'singular_name' => $singular,
             'menu_name' => $plural,
-            'all_items' => 'Todos os ' . $plural,
-            'edit_item' => 'Editar ' . $singular,
-            'view_item' => 'Ver ' . $singular,
-            'update_item' => 'Atualizar ' . $singular,
-            'add_new_item' => 'Adicionar Novo ' . $singular,
-            'new_item_name' => 'Nome do Novo ' . $singular,
-            'parent_item' => $singular . ' Pai',
-            'parent_item_colon' => $singular . ' Pai:',
-            'search_items' => 'Buscar ' . $plural,
-            'popular_items' => $plural . ' Populares',
-            'separate_items_with_commas' => 'Separar ' . strtolower($plural) . ' com vírgulas',
-            'add_or_remove_items' => 'Adicionar ou remover ' . strtolower($plural),
-            'choose_from_most_used' => 'Escolher dos ' . strtolower($plural) . ' mais usados',
-            'not_found' => 'Nenhum ' . strtolower($singular) . ' encontrado.',
-            'no_terms' => 'Nenhum ' . strtolower($singular),
-            'items_list_navigation' => 'Navegação da lista de ' . strtolower($plural),
-            'items_list' => 'Lista de ' . strtolower($plural),
+            'all_items' => sprintf(__('All %s', 'fuerza-theme'), $plural),
+            'edit_item' => sprintf(__('Edit %s', 'fuerza-theme'), $singular),
+            'view_item' => sprintf(__('View %s', 'fuerza-theme'), $singular),
+            'update_item' => sprintf(__('Update %s', 'fuerza-theme'), $singular),
+            'add_new_item' => sprintf(__('Add New %s', 'fuerza-theme'), $singular),
+            'new_item_name' => sprintf(__('New %s Name', 'fuerza-theme'), $singular),
+            'parent_item' => sprintf(__('Parent %s', 'fuerza-theme'), $singular),
+            'parent_item_colon' => sprintf(__('Parent %s:', 'fuerza-theme'), $singular),
+            'search_items' => sprintf(__('Search %s', 'fuerza-theme'), $plural),
+            'popular_items' => sprintf(__('Popular %s', 'fuerza-theme'), $plural),
+            'separate_items_with_commas' => sprintf(__('Separate %s with commas', 'fuerza-theme'), strtolower($plural)),
+            'add_or_remove_items' => sprintf(__('Add or remove %s', 'fuerza-theme'), strtolower($plural)),
+            'choose_from_most_used' => sprintf(__('Choose from most used %s', 'fuerza-theme'), strtolower($plural)),
+            'not_found' => sprintf(__('No %s found.', 'fuerza-theme'), strtolower($plural)),
+            'no_terms' => sprintf(__('No %s', 'fuerza-theme'), strtolower($plural)),
+            'items_list_navigation' => sprintf(__('%s list navigation', 'fuerza-theme'), $plural),
+            'items_list' => sprintf(__('%s list', 'fuerza-theme'), $plural),
         ];
         
-        // Permitir override de labels específicos
+        // Allow override of specific labels
         if (isset($config['labels']) && is_array($config['labels'])) {
             $labels = array_merge($labels, $config['labels']);
         }
@@ -146,41 +146,41 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Aplicar configurações adicionais
+     * Apply additional configurations
      */
     private function apply_additional_configs($taxonomy, $config) {
-        // Configurar campos personalizados para termos
+        // Configure custom fields for terms
         if (isset($config['term_meta_fields']) && is_array($config['term_meta_fields'])) {
             $this->setup_term_meta_fields($taxonomy, $config['term_meta_fields']);
         }
         
-        // Configurar colunas administrativas personalizadas
+        // Configure custom admin columns
         if (isset($config['admin_columns']) && is_array($config['admin_columns'])) {
             $this->setup_admin_columns($taxonomy, $config['admin_columns']);
         }
         
-        // Configurar hooks personalizados
+        // Configure custom hooks
         if (isset($config['hooks']) && is_array($config['hooks'])) {
             $this->setup_custom_hooks($taxonomy, $config['hooks']);
         }
     }
     
     /**
-     * Configurar campos meta para termos
+     * Configure meta fields for terms
      */
     private function setup_term_meta_fields($taxonomy, $meta_fields) {
         foreach ($meta_fields as $field) {
-            // Adicionar campo ao formulário de criação
+            // Add field to creation form
             add_action("{$taxonomy}_add_form_fields", function() use ($field) {
                 $this->render_term_meta_field($field, 'add');
             });
             
-            // Adicionar campo ao formulário de edição
+            // Add field to edit form
             add_action("{$taxonomy}_edit_form_fields", function($term) use ($field) {
                 $this->render_term_meta_field($field, 'edit', $term);
             });
             
-            // Salvar campo
+            // Save field
             add_action("created_{$taxonomy}", function($term_id) use ($field) {
                 $this->save_term_meta_field($term_id, $field);
             });
@@ -192,7 +192,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Renderizar campo meta do termo
+     * Render term meta field
      */
     private function render_term_meta_field($field, $context, $term = null) {
         $value = $term ? get_term_meta($term->term_id, $field['key'], true) : '';
@@ -240,7 +240,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Salvar campo meta do termo
+     * Save term meta field
      */
     private function save_term_meta_field($term_id, $field) {
         if (isset($_POST[$field['key']])) {
@@ -250,15 +250,15 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Configurar colunas administrativas
+     * Configure admin columns
      */
     private function setup_admin_columns($taxonomy, $columns) {
-        // Adicionar colunas
+        // Add columns
         add_filter("manage_edit-{$taxonomy}_columns", function($existing_columns) use ($columns) {
             return array_merge($existing_columns, $columns);
         });
         
-        // Popular colunas
+        // Populate columns
         add_filter("manage_{$taxonomy}_custom_column", function($content, $column, $term_id) use ($columns) {
             if (isset($columns[$column]) && isset($columns[$column]['callback'])) {
                 return call_user_func($columns[$column]['callback'], $content, $column, $term_id);
@@ -268,7 +268,7 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Configurar hooks personalizados
+     * Configure custom hooks
      */
     private function setup_custom_hooks($taxonomy, $hooks) {
         foreach ($hooks as $hook => $callback) {
@@ -277,26 +277,26 @@ class Taxonomy_Manager {
     }
     
     /**
-     * Obter todas as taxonomias registradas
+     * Get all registered taxonomies
      */
     public static function get_registered_taxonomies() {
         return self::$registered_taxonomies;
     }
     
     /**
-     * Verificar se uma taxonomia está registrada
+     * Check if a taxonomy is registered
      */
     public static function is_taxonomy_registered($taxonomy) {
         return isset(self::$registered_taxonomies[$taxonomy]);
     }
     
     /**
-     * Obter configuração de uma taxonomia específica
+     * Get specific taxonomy configuration
      */
     public static function get_taxonomy_config($taxonomy) {
         return self::$registered_taxonomies[$taxonomy] ?? null;
     }
 }
 
-// Inicializar o gerenciador
+// Initialize the manager
 Taxonomy_Manager::get_instance();

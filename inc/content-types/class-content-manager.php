@@ -1,6 +1,6 @@
 <?php
 /**
- * Gerenciador principal de conteúdo (CPTs e Taxonomias)
+ * Main Content Manager (CPTs and Taxonomies)
  * 
  * @package FuerzaThemeAPI
  */
@@ -12,12 +12,12 @@ if (!defined('ABSPATH')) {
 class Content_Manager {
     
     /**
-     * Instância singleton
+     * Singleton instance
      */
     private static $instance = null;
     
     /**
-     * Obtém instância singleton
+     * Get singleton instance
      */
     public static function get_instance() {
         if (self::$instance === null) {
@@ -27,7 +27,7 @@ class Content_Manager {
     }
     
     /**
-     * Construtor privado
+     * Private constructor
      */
     private function __construct() {
         $this->load_managers();
@@ -35,7 +35,7 @@ class Content_Manager {
     }
     
     /**
-     * Carrega os gerenciadores
+     * Load managers
      */
     private function load_managers() {
         require_once get_template_directory() . '/inc/content-types/class-cpt-manager.php';
@@ -43,20 +43,20 @@ class Content_Manager {
     }
     
     /**
-     * Configura hooks
+     * Setup hooks
      */
     private function setup_hooks() {
-        // Hook para flush rewrite rules quando necessário
+        // Hook to flush rewrite rules when necessary
         add_action('after_switch_theme', 'flush_rewrite_rules');
         
-        // Hook para debug de CPTs e taxonomias (apenas para admins)
+        // Hook for CPTs and taxonomies debug (admin only)
         if (current_user_can('manage_options')) {
             add_action('wp_footer', [$this, 'debug_content_types']);
         }
     }
     
     /**
-     * Debug de tipos de conteúdo (apenas para desenvolvimento)
+     * Debug content types (development only)
      */
     public function debug_content_types() {
         if (!WP_DEBUG || !current_user_can('manage_options')) {
@@ -74,63 +74,63 @@ class Content_Manager {
     }
     
     /**
-     * Registrar um novo CPT usando o sistema dinâmico
+     * Register a new CPT using the dynamic system
      */
     public static function register_cpt($post_type, $config = []) {
         return CPT_Manager::register_cpt($post_type, $config);
     }
     
     /**
-     * Registrar uma nova taxonomia usando o sistema dinâmico
+     * Register a new taxonomy using the dynamic system
      */
     public static function register_taxonomy($taxonomy, $post_types, $config = []) {
         return Taxonomy_Manager::register_taxonomy($taxonomy, $post_types, $config);
     }
     
     /**
-     * Obter informações de todos os CPTs registrados
+     * Get information for all registered CPTs
      */
     public static function get_all_cpts() {
         return CPT_Manager::get_registered_cpts();
     }
     
     /**
-     * Obter informações de todas as taxonomias registradas
+     * Get information for all registered taxonomies
      */
     public static function get_all_taxonomies() {
         return Taxonomy_Manager::get_registered_taxonomies();
     }
     
     /**
-     * Verificar se um CPT está registrado
+     * Check if a CPT is registered
      */
     public static function cpt_exists($post_type) {
         return CPT_Manager::is_cpt_registered($post_type);
     }
     
     /**
-     * Verificar se uma taxonomia está registrada
+     * Check if a taxonomy is registered
      */
     public static function taxonomy_exists($taxonomy) {
         return Taxonomy_Manager::is_taxonomy_registered($taxonomy);
     }
     
     /**
-     * Obter configuração de um CPT específico
+     * Get specific CPT configuration
      */
     public static function get_cpt_config($post_type) {
         return CPT_Manager::get_cpt_config($post_type);
     }
     
     /**
-     * Obter configuração de uma taxonomia específica
+     * Get specific taxonomy configuration
      */
     public static function get_taxonomy_config($taxonomy) {
         return Taxonomy_Manager::get_taxonomy_config($taxonomy);
     }
     
     /**
-     * Função utilitária para criar um CPT simples
+     * Utility function to create a simple CPT
      */
     public static function create_simple_cpt($post_type, $singular_name, $plural_name, $options = []) {
         $config = array_merge([
@@ -146,7 +146,7 @@ class Content_Manager {
     }
     
     /**
-     * Função utilitária para criar uma taxonomia simples
+     * Utility function to create a simple taxonomy
      */
     public static function create_simple_taxonomy($taxonomy, $post_types, $singular_name, $plural_name, $options = []) {
         $config = array_merge([
@@ -161,5 +161,5 @@ class Content_Manager {
     }
 }
 
-// Inicializar o gerenciador
+// Initialize the manager
 Content_Manager::get_instance();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Funções principais do tema Fuerza Theme API
+ * Main functions for Fuerza Theme API
  * 
  * @package FuerzaThemeAPI
  */
@@ -9,21 +9,26 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Carregar configurações básicas do tema
+// Load theme text domain for translations
+add_action('after_setup_theme', function() {
+    load_theme_textdomain('fuerza-theme', get_template_directory() . '/languages');
+});
+
+// Load theme basic configurations
 require_once get_template_directory() . '/inc/setup.php';
 
-// Carregar custom post types e taxonomias
+// Load custom post types and taxonomies
 require_once get_template_directory() . '/inc/custom-post-types.php';
 require_once get_template_directory() . '/inc/taxonomies.php';
 
-// Carregar sistema de API
+// Load API system
 require_once get_template_directory() . '/inc/rest-api.php';
 
-// Carregar funcionalidades administrativas
+// Load administrative functionalities
 require_once get_template_directory() . '/inc/admin.php';
 require_once get_template_directory() . '/inc/helpers.php';
 
-// Carregar sistema de logging, monitoramento, cache, rate limiting, documentação e performance
+// Load logging, monitoring, cache, rate limiting, documentation and performance systems
 require_once get_template_directory() . '/inc/class-logger.php';
 require_once get_template_directory() . '/inc/class-monitor.php';
 require_once get_template_directory() . '/inc/class-cache.php';
@@ -32,5 +37,5 @@ require_once get_template_directory() . '/inc/class-api-docs.php';
 require_once get_template_directory() . '/inc/class-performance.php';
 require_once get_template_directory() . '/inc/class-api-tester.php';
 
-// Carregar dashboard administrativo
+// Load administrative dashboard
 require_once get_template_directory() . '/inc/admin-dashboard.php';

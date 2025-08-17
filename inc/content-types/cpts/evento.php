@@ -2,7 +2,7 @@
 /**
  * Custom Post Type: Eventos
  * 
- * Gerado automaticamente em 2025-08-17 20:23:50
+ * Auto-generated on 2025-08-17 20:49:44
  * 
  * @package FuerzaThemeAPI
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Registrar CPT de Eventos usando o sistema dinâmico
+// Register Eventos CPT using the dynamic system
 Content_Manager::register_cpt('evento', [
     'singular_name' => 'Evento',
     'plural_name' => 'Eventos',
@@ -33,14 +33,14 @@ Content_Manager::register_cpt('evento', [
         'slug' => 'evento',
         'with_front' => false,
     ],
-    'menu_icon' => 'dashicons-admin-post',
+    'menu_icon' => 'dashicons-tag',
     'menu_position' => 20,
     'hierarchical' => false,
     'query_var' => true,
     'capability_type' => 'post',
     'map_meta_cap' => true,
     
-    // Configurações administrativas personalizadas
+    // Custom administrative settings
     'admin_columns' => [
         'evento_status' => [
             'title' => 'Status',
@@ -52,17 +52,17 @@ Content_Manager::register_cpt('evento', [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     'hooks' => [
         'save_post_evento' => function($post_id) {
-            // Lógica executada quando um Evento é salvo
+            // Logic executed when um Evento é salvo
             if (function_exists('wp_cache_delete')) {
                 wp_cache_delete('evento_list', 'fuerza_theme');
             }
         }
     ],
     
-    // Labels personalizados específicos
+    // Specific custom labels
     'labels' => [
         'featured_image' => 'Imagem do Evento',
         'set_featured_image' => 'Definir imagem do Evento',

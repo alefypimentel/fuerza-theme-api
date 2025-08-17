@@ -7,7 +7,7 @@ const chalk = require('chalk');
 const ora = require('ora');
 
 async function removeCPT() {
-  console.log(chalk.red.bold('\n🗑️  Remover Custom Post Types e Taxonomias\n'));
+  console.log(chalk.red.bold('\n🗑️  Remove Custom Post Types and Taxonomies\n'));
 
   // Listar CPTs existentes
   const cptsDir = path.join(__dirname, '../inc/content-types/cpts');
@@ -32,7 +32,7 @@ async function removeCPT() {
   }
 
   if (availableCPTs.length === 0 && availableTaxonomies.length === 0) {
-    console.log(chalk.yellow('⚠️  Nenhum CPT ou taxonomia encontrado para remover.'));
+    console.log(chalk.yellow('⚠️  No CPT or taxonomy found para remover.'));
     return;
   }
 
@@ -40,11 +40,11 @@ async function removeCPT() {
     {
       type: 'list',
       name: 'actionType',
-      message: 'O que você deseja remover?',
+      message: 'What do you want to remove??',
       choices: [
         { name: '🗂️  Custom Post Type (e arquivos relacionados)', value: 'cpt' },
-        { name: '🏷️  Taxonomia específica', value: 'taxonomy' },
-        { name: '🧹 Limpeza completa (CPT + taxonomias + API)', value: 'complete' }
+        { name: '🏷️  Specific Taxonomy', value: 'taxonomy' },
+        { name: '🧹 Complete cleanup (CPT + taxonomias + API)', value: 'complete' }
       ]
     }
   ]);
@@ -61,7 +61,7 @@ async function removeCPT() {
       {
         type: 'list',
         name: 'selectedCPT',
-        message: 'Qual CPT deseja remover?',
+        message: 'Which CPT do you want to remove??',
         choices: availableCPTs.map(cpt => ({
           name: `📝 ${cpt}`,
           value: cpt
@@ -70,7 +70,7 @@ async function removeCPT() {
       {
         type: 'confirm',
         name: 'removeRelated',
-        message: 'Remover também taxonomias e arquivos da API relacionados?',
+        message: 'Also remove related taxonomies and API files??',
         default: true
       }
     ]);
@@ -91,7 +91,7 @@ async function removeCPT() {
       {
         type: 'list',
         name: 'selectedTaxonomy',
-        message: 'Qual taxonomia deseja remover?',
+        message: 'Which taxonomy do you want to remove??',
         choices: availableTaxonomies.map(taxonomy => ({
           name: `🏷️  ${taxonomy}`,
           value: taxonomy
@@ -109,7 +109,7 @@ async function removeCPT() {
       {
         type: 'checkbox',
         name: 'selectedItems',
-        message: 'Selecione os itens para remover:',
+        message: 'Select items to remove:',
         choices: [
           ...availableCPTs.map(cpt => ({
             name: `📝 CPT: ${cpt}`,
@@ -124,7 +124,7 @@ async function removeCPT() {
         ],
         validate: (choices) => {
           if (choices.length === 0) {
-            return 'Selecione pelo menos um item para remover.';
+            return 'Select at least one item para remover.';
           }
           return true;
         }
@@ -139,17 +139,17 @@ async function removeCPT() {
     {
       type: 'confirm',
       name: 'confirmRemoval',
-      message: chalk.red('⚠️  ATENÇÃO: Esta ação não pode ser desfeita. Confirmar remoção?'),
+      message: chalk.red('⚠️  WARNING: This action cannot be undone. Confirm removal??'),
       default: false
     }
   ]);
 
   if (!confirmAnswer.confirmRemoval) {
-    console.log(chalk.yellow('❌ Operação cancelada.'));
+    console.log(chalk.yellow('❌ Operation cancelled.'));
     return;
   }
 
-  const spinner = ora('Removendo arquivos...').start();
+  const spinner = ora('Removing files...').start();
   const removedFiles = [];
   const errors = [];
 
@@ -215,35 +215,35 @@ async function removeCPT() {
       }
     }
 
-    spinner.succeed(chalk.green('Arquivos removidos com sucesso!'));
+    spinner.succeed(chalk.green('Files removed successfully!'));
 
     if (removedFiles.length > 0) {
-      console.log(chalk.yellow.bold('\n📁 Arquivos removidos:'));
+      console.log(chalk.yellow.bold('\n📁 Files removed:'));
       removedFiles.forEach(file => {
         console.log(chalk.gray(`  ✓ ${file}`));
       });
     }
 
     if (errors.length > 0) {
-      console.log(chalk.red.bold('\n❌ Erros encontrados:'));
+      console.log(chalk.red.bold('\n❌ Errors found:'));
       errors.forEach(error => {
         console.log(chalk.red(`  ✗ ${error}`));
       });
     }
 
-    console.log(chalk.blue.bold('\n🔄 Próximos passos:'));
-    console.log(chalk.gray('  1. Acesse o admin do WordPress'));
-    console.log(chalk.gray('  2. Vá em Configurações > Links Permanentes'));
-    console.log(chalk.gray('  3. Clique em "Salvar alterações" para atualizar as URLs'));
-    console.log(chalk.gray('  4. Limpe o cache se necessário'));
+    console.log(chalk.blue.bold('\n🔄 Next steps:'));
+    console.log(chalk.gray('  1. Access WordPress admin'));
+    console.log(chalk.gray('  2. Go to Settings > Permalinks'));
+    console.log(chalk.gray('  3. Click "Save Changes" para atualizar as URLs'));
+    console.log(chalk.gray('  4. Clear cache if necessary'));
 
-    console.log(chalk.yellow.bold('\n⚠️  Importante:'));
-    console.log(chalk.yellow('  • Os dados (posts, termos) não foram removidos do banco'));
-    console.log(chalk.yellow('  • Para remover dados, use o admin do WordPress'));
-    console.log(chalk.yellow('  • Considere fazer backup antes de remover dados'));
+    console.log(chalk.yellow.bold('\n⚠️  Important:'));
+    console.log(chalk.yellow('  • The data was not removed from the database'));
+    console.log(chalk.yellow('  • To remove data, use WordPress admin'));
+    console.log(chalk.yellow('  • Consider making a backup antes de remover dados'));
 
   } catch (error) {
-    spinner.fail(chalk.red('Erro ao remover arquivos'));
+    spinner.fail(chalk.red('Error removing files'));
     console.error(chalk.red(error.message));
     process.exit(1);
   }

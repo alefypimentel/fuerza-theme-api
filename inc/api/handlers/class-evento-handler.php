@@ -1,8 +1,8 @@
 <?php
 /**
- * Manipulador para rotas de Eventos
+ * Handler for routes of Eventos
  * 
- * Gerado automaticamente em 2025-08-17 20:23:50
+ * Auto-generated on 2025-08-17 20:49:44
  * 
  * @package FuerzaThemeAPI
  */
@@ -16,7 +16,7 @@ require_once get_template_directory() . '/inc/api/formatters/class-evento-format
 class Evento_Handler {
     
     /**
-     * Obter Eventos formatados
+     * Get formatted
      */
     public static function get_Eventos($request) {
         $per_page = $request->get_param('per_page');
@@ -51,49 +51,57 @@ class Evento_Handler {
 
         // Executar query
         $query = new WP_Query($args);
-        $Eventos = [];
-
+        
         if ($query->have_posts()) {
-            $Eventos = Evento_Formatter::format_Eventos($query->posts);
+            $items = [];
+            while ($query->have_posts()) {
+                $query->the_post();
+                $items[] = Evento_Formatter::format_single(get_post());
+            }
+            wp_reset_postdata();
+            
+            return [
+                'eventos' => $items,
+                'pagination' => [
+                    'total' => $query->found_posts,
+                    'pages' => $query->max_num_pages,
+                    'current_page' => $page,
+                    'per_page' => $per_page,
+                ],
+            ];
         }
-
-        // Formatar resposta com paginação
-        return [
-            'Eventos' => $Eventos,
-            'paginacao' => Evento_Formatter::format_pagination($query, $page, $per_page),
-        ];
+        
+        wp_reset_postdata();
+        return new WP_Error('no_eventos', 'Nenhum evento encontrado', ['status' => 404]);
     }
     
     /**
-     * Obter um Evento específico
+     * Get specific
      */
     public static function get_evento($request) {
-        $id = $request->get_param('id');
+        $id = absint($request->get_param('id'));
         
-        $post = get_post($id);
+        if (!$id) {
+            return new WP_Error('invalid_id', 'ID do evento é obrigatório', ['status' => 400]);
+        }
         
-        if (!$post || $post->post_type !== 'evento' || $post->post_status !== 'publish') {
-            return new WP_Error(
-                'evento_not_found',
-                'Evento não encontrado.',
-                ['status' => 404]
-            );
+        $item = get_post($id);
+        
+        if (!$item || $item->post_type !== 'evento' || $item->post_status !== 'publish') {
+            return new WP_Error('evento_not_found', 'Evento não encontrado', ['status' => 404]);
         }
         
         return Evento_Formatter::format_evento($id);
     }
     
     /**
-     * Validar parâmetros da requisição
+     * Validate parameters da requisição
      */
     public static function validate_Eventos_params() {
         return [
             'per_page' => [
                 'default' => 10,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => function($param) {
-                    return is_numeric($param) && $param > 0 && $param <= 100;
-                },
             ],
             'page' => [
                 'default' => 1,
@@ -117,16 +125,13 @@ class Evento_Handler {
     }
     
     /**
-     * Validar parâmetros de Evento específico
+     * Validate parameters de Evento específico
      */
     public static function validate_evento_params() {
         return [
             'id' => [
                 'required' => true,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => function($param) {
-                    return is_numeric($param) && $param > 0;
-                },
             ],
         ];
     }

@@ -11,7 +11,7 @@ const cptTemplate = (data) => `<?php
 /**
  * Custom Post Type: ${data.pluralName}
  * 
- * Gerado automaticamente em ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+ * Auto-generated on ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
  * 
  * @package FuerzaThemeAPI
  */
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Registrar CPT de ${data.pluralName} usando o sistema dinâmico
+// Register ${data.pluralName} CPT using the dynamic system
 Content_Manager::register_cpt('${data.slug}', [
     'singular_name' => '${data.singularName}',
     'plural_name' => '${data.pluralName}',
@@ -49,7 +49,7 @@ Content_Manager::register_cpt('${data.slug}', [
     'capability_type' => 'post',
     'map_meta_cap' => true,
     
-    // Configurações administrativas personalizadas
+    // Custom administrative settings
     'admin_columns' => [
         '${data.slug}_status' => [
             'title' => 'Status',
@@ -61,17 +61,17 @@ Content_Manager::register_cpt('${data.slug}', [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     'hooks' => [
         'save_post_${data.slug}' => function($post_id) {
-            // Lógica executada quando um ${data.singularName} é salvo
+            // Logic executed when um ${data.singularName} é salvo
             if (function_exists('wp_cache_delete')) {
                 wp_cache_delete('${data.slug}_list', 'fuerza_theme');
             }
         }
     ],
     
-    // Labels personalizados específicos
+    // Specific custom labels
     'labels' => [
         'featured_image' => 'Imagem do ${data.singularName}',
         'set_featured_image' => 'Definir imagem do ${data.singularName}',
@@ -82,9 +82,9 @@ Content_Manager::register_cpt('${data.slug}', [
 
 const handlerTemplate = (data) => `<?php
 /**
- * Manipulador para rotas de ${data.pluralName}
+ * Handler for routes of ${data.pluralName}
  * 
- * Gerado automaticamente em ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+ * Auto-generated on ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
  * 
  * @package FuerzaThemeAPI
  */
@@ -98,7 +98,7 @@ require_once get_template_directory() . '/inc/api/formatters/class-${data.slug}-
 class ${data.className}_Handler {
     
     /**
-     * Obter ${data.pluralName} formatados
+     * Get formatted
      */
     public static function get_${data.pluralName}($request) {
         $per_page = $request->get_param('per_page');
@@ -158,7 +158,7 @@ class ${data.className}_Handler {
     }
     
     /**
-     * Obter ${data.singularName} específico
+     * Get specific
      */
     public static function get_${data.slug}($request) {
         $id = absint($request->get_param('id'));
@@ -177,7 +177,7 @@ class ${data.className}_Handler {
     }
     
     /**
-     * Validar parâmetros da requisição
+     * Validate parameters da requisição
      */
     public static function validate_${data.pluralName}_params() {
         return [
@@ -207,7 +207,7 @@ class ${data.className}_Handler {
     }
     
     /**
-     * Validar parâmetros de ${data.singularName} específico
+     * Validate parameters de ${data.singularName} específico
      */
     public static function validate_${data.slug}_params() {
         return [
@@ -221,9 +221,9 @@ class ${data.className}_Handler {
 
 const routesTemplate = (data) => `<?php
 /**
- * Rotas da API para ${data.pluralName}
+ * API Routes for ${data.pluralName}
  * 
- * Gerado automaticamente em ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+ * Auto-generated on ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
  * 
  * @package FuerzaThemeAPI
  */
@@ -259,7 +259,7 @@ const taxonomyTemplate = (data) => `<?php
 /**
  * Taxonomia: Categoria de ${data.pluralName}
  * 
- * Gerado automaticamente em ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+ * Auto-generated on ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
  * 
  * @package FuerzaThemeAPI
  */
@@ -327,7 +327,7 @@ Content_Manager::register_taxonomy('categoria_${data.slug}', ['${data.slug}'], [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     'hooks' => [
         'created_categoria_${data.slug}' => function($term_id) {
             if (function_exists('wp_cache_delete')) {
@@ -339,9 +339,9 @@ Content_Manager::register_taxonomy('categoria_${data.slug}', ['${data.slug}'], [
 
 const formatterTemplate = (data) => `<?php
 /**
- * Formatador para dados de ${data.pluralName}
+ * Formatter for data of ${data.pluralName}
  * 
- * Gerado automaticamente em ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+ * Auto-generated on ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
  * 
  * @package FuerzaThemeAPI
  */
@@ -355,7 +355,7 @@ require_once get_template_directory() . '/inc/api/formatters/class-base-formatte
 class ${data.className}_Formatter extends Base_Formatter {
     
     /**
-     * Formatar dados de um ${data.singularName}
+     * Format data for a ${data.singularName}
      */
     public static function format_${data.slug}($post_id = null) {
         if ($post_id) {
@@ -382,7 +382,7 @@ class ${data.className}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar categorias específicas
+     * Format specific categories
      */
     public static function format_${data.slug}_categories($post_id) {
         $taxonomies = ['categoria_${data.slug}', 'category'];
@@ -390,14 +390,14 @@ class ${data.className}_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar lista de ${data.pluralName}
+     * Format list of ${data.pluralName}
      */
     public static function format_single($post) {
         return self::format_${data.slug}($post->ID);
     }
     
     /**
-     * Formatar múltiplos ${data.pluralName}
+     * Format multiple ${data.pluralName}
      */
     public static function format_multiple($posts) {
         $items = [];

@@ -2,7 +2,7 @@
 /**
  * Taxonomia: Categoria de Eventos
  * 
- * Gerado automaticamente em 2025-08-17 20:23:50
+ * Auto-generated on 2025-08-17 20:49:44
  * 
  * @package FuerzaThemeAPI
  */
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 Content_Manager::register_taxonomy('categoria_evento', ['evento'], [
     'singular_name' => 'Categoria de Evento',
     'plural_name' => 'Categorias de Eventos',
-    'description' => 'Categorias para organizar Eventos',
+    'description' => 'Categorias para organizar eventos',
     'hierarchical' => true,
     'public' => true,
     'show_in_rest' => true,
@@ -70,7 +70,7 @@ Content_Manager::register_taxonomy('categoria_evento', ['evento'], [
         ]
     ],
     
-    // Hooks personalizados
+    // Custom hooks
     'hooks' => [
         'created_categoria_evento' => function($term_id) {
             if (function_exists('wp_cache_delete')) {

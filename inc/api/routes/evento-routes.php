@@ -1,8 +1,8 @@
 <?php
 /**
- * Rotas da API para Eventos
+ * API Routes for Eventos
  * 
- * Gerado automaticamente em 2025-08-17 20:23:50
+ * Auto-generated on 2025-08-17 20:49:44
  * 
  * @package FuerzaThemeAPI
  */
@@ -21,7 +21,8 @@ $api_manager->add_route(
     '/Eventos',
     'GET',
     [Evento_Handler::class, 'get_Eventos'],
-    Evento_Handler::validate_Eventos_params()
+    Evento_Handler::validate_Eventos_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );
 
 // Registrar rota para obter Evento específico
@@ -29,5 +30,6 @@ $api_manager->add_route(
     '/Eventos/(?P<id>\d+)',
     'GET',
     [Evento_Handler::class, 'get_evento'],
-    Evento_Handler::validate_evento_params()
+    Evento_Handler::validate_evento_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );

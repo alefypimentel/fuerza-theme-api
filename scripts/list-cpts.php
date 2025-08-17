@@ -3,7 +3,7 @@
 /**
  * Script para listar CPTs e Taxonomias registrados
  * 
- * Lista todos os Custom Post Types e Taxonomias criados pelo sistema
+ * List all Custom Post Types e Taxonomias criados pelo sistema
  * 
  * Uso:
  * php scripts/list-cpts.php
@@ -16,7 +16,7 @@
 
 // Verificar se está sendo executado via CLI
 if (php_sapi_name() !== 'cli') {
-    die("Este script deve ser executado via linha de comando.\n");
+    die("This script must be run via command line.\n");
 }
 
 class CPTLister {
@@ -31,7 +31,7 @@ class CPTLister {
     }
     
     /**
-     * Executar o listador
+     * Run the lister
      */
     private function run() {
         $this->printHeader();
@@ -51,7 +51,7 @@ class CPTLister {
     }
     
     /**
-     * Analisar argumentos da linha de comando
+     * Parse command line arguments
      */
     private function parseArguments() {
         global $argv;
@@ -74,7 +74,7 @@ class CPTLister {
     }
     
     /**
-     * Obter lista de CPTs
+     * Get CPTs list
      */
     private function getCPTs() {
         $cptsDir = $this->theme_path . '/inc/content-types/cpts';
@@ -90,7 +90,7 @@ class CPTLister {
             $name = basename($file, '.php');
             $content = file_get_contents($file);
             
-            // Extrair informações do arquivo
+            // Extract file information
             $info = $this->extractCPTInfo($content, $name);
             $info['file'] = str_replace($this->theme_path . '/', '', $file);
             $info['size'] = $this->formatFileSize(filesize($file));
@@ -103,7 +103,7 @@ class CPTLister {
     }
     
     /**
-     * Obter lista de taxonomias
+     * Get taxonomies list
      */
     private function getTaxonomies() {
         $taxonomiesDir = $this->theme_path . '/inc/content-types/taxonomies';
@@ -119,7 +119,7 @@ class CPTLister {
             $name = basename($file, '.php');
             $content = file_get_contents($file);
             
-            // Extrair informações do arquivo
+            // Extract file information
             $info = $this->extractTaxonomyInfo($content, $name);
             $info['file'] = str_replace($this->theme_path . '/', '', $file);
             $info['size'] = $this->formatFileSize(filesize($file));
@@ -132,7 +132,7 @@ class CPTLister {
     }
     
     /**
-     * Obter lista de arquivos da API
+     * Get API files list
      */
     private function getAPIFiles() {
         $apiFiles = [];
@@ -181,7 +181,7 @@ class CPTLister {
     }
     
     /**
-     * Extrair informações do CPT
+     * Extract CPT information
      */
     private function extractCPTInfo($content, $name) {
         $info = [
@@ -210,7 +210,7 @@ class CPTLister {
     }
     
     /**
-     * Extrair informações da taxonomia
+     * Extract taxonomy information
      */
     private function extractTaxonomyInfo($content, $name) {
         $info = [
@@ -245,7 +245,7 @@ class CPTLister {
     }
     
     /**
-     * Formatar tamanho do arquivo
+     * Format file size
      */
     private function formatFileSize($bytes) {
         $units = ['B', 'KB', 'MB', 'GB'];
@@ -259,7 +259,7 @@ class CPTLister {
     }
     
     /**
-     * Saída em formato JSON
+     * JSON format output
      */
     private function outputJSON($cpts, $taxonomies, $apis, $only) {
         $output = [];
@@ -285,7 +285,7 @@ class CPTLister {
     }
     
     /**
-     * Saída em formato tabela
+     * Table format output
      */
     private function outputTable($cpts, $taxonomies, $apis, $only) {
         if ($only === 'all' || $only === 'cpts') {
@@ -303,11 +303,11 @@ class CPTLister {
     }
     
     /**
-     * Imprimir tabela de CPTs
+     * Print CPTs table
      */
     private function printCPTsTable($cpts) {
         if (empty($cpts)) {
-            echo "📝 Nenhum Custom Post Type encontrado.\n\n";
+            echo "📝 No Custom Post Type found.\n\n";
             return;
         }
         
@@ -331,11 +331,11 @@ class CPTLister {
     }
     
     /**
-     * Imprimir tabela de taxonomias
+     * Print taxonomies table
      */
     private function printTaxonomiesTable($taxonomies) {
         if (empty($taxonomies)) {
-            echo "🏷️  Nenhuma taxonomia encontrada.\n\n";
+            echo "🏷️  No taxonomy found.\n\n";
             return;
         }
         
@@ -359,11 +359,11 @@ class CPTLister {
     }
     
     /**
-     * Imprimir tabela de arquivos da API
+     * Print API files table
      */
     private function printAPIFilesTable($apis) {
         if (empty($apis)) {
-            echo "📡 Nenhum arquivo de API encontrado.\n\n";
+            echo "📡 No API file found.\n\n";
             return;
         }
         
@@ -388,7 +388,7 @@ class CPTLister {
     }
     
     /**
-     * Imprimir resumo
+     * Print summary
      */
     private function printSummary($cpts, $taxonomies, $apis) {
         echo "📊 RESUMO\n";
@@ -406,14 +406,14 @@ class CPTLister {
         }
         
         if (!empty($incomplete)) {
-            echo "\n⚠️  CPTs sem API completa: " . implode(', ', $incomplete) . "\n";
+            echo "\n⚠️  CPTs without complete API: " . implode(', ', $incomplete) . "\n";
         }
         
         echo "\n";
     }
     
     /**
-     * Imprimir cabeçalho da tabela
+     * Print table header
      */
     private function printTableHeader($headers) {
         $widths = [15, 20, 20, 30, 10, 20];
@@ -430,7 +430,7 @@ class CPTLister {
     }
     
     /**
-     * Imprimir linha da tabela
+     * Print table row
      */
     private function printTableRow($values) {
         $widths = [15, 20, 20, 30, 10, 20];
@@ -446,7 +446,7 @@ class CPTLister {
     }
     
     /**
-     * Imprimir cabeçalho
+     * Print header
      */
     private function printHeader() {
         if (isset($this->options['format']) && $this->options['format'] === 'json') {
@@ -454,7 +454,7 @@ class CPTLister {
         }
         
         echo "\n";
-        echo "🗂️  Listagem de CPTs e Taxonomias\n";
+        echo "🗂️  CPTs and Taxonomies Listing\n";
         echo "==================================\n\n";
     }
 }
@@ -462,11 +462,11 @@ class CPTLister {
 // Verificar se é pedido de ajuda
 if (in_array('--help', $argv)) {
     echo "\n";
-    echo "🗂️  Listagem de CPTs e Taxonomias\n";
+    echo "🗂️  CPTs and Taxonomies Listing\n";
     echo "==================================\n\n";
     echo "Uso: php scripts/list-cpts.php [opções]\n\n";
     echo "Opções:\n";
-    echo "  --format=json         Saída em formato JSON\n";
+    echo "  --format=json         JSON format output\n";
     echo "  --only=cpts           Listar apenas CPTs\n";
     echo "  --only=taxonomies     Listar apenas taxonomias\n";
     echo "  --help                Mostrar esta ajuda\n\n";
@@ -478,5 +478,5 @@ if (in_array('--help', $argv)) {
     exit(0);
 }
 
-// Executar o listador
+// Run the lister
 new CPTLister();

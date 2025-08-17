@@ -1,8 +1,8 @@
 <?php
 /**
- * Formatador para dados de Eventos
+ * Formatter for data of Eventos
  * 
- * Gerado automaticamente em 2025-08-17 20:23:50
+ * Auto-generated on 2025-08-17 20:49:44
  * 
  * @package FuerzaThemeAPI
  */
@@ -16,7 +16,7 @@ require_once get_template_directory() . '/inc/api/formatters/class-base-formatte
 class Evento_Formatter extends Base_Formatter {
     
     /**
-     * Formatar dados de um Evento
+     * Format data for a Evento
      */
     public static function format_evento($post_id = null) {
         if ($post_id) {
@@ -27,23 +27,23 @@ class Evento_Formatter extends Base_Formatter {
         }
         
         // Dados básicos do post
-        $evento = self::format_basic_post_data($post_id);
+        $item = self::format_basic_post_data($post_id);
         
         // Adicionar dados específicos
-        $evento['imagem_destacada'] = self::format_featured_image($post_id);
-        $evento['autor'] = self::format_author($post_id);
-        $evento['categorias'] = self::format_evento_categories($post_id);
-        $evento['acf'] = self::format_acf_fields($post_id);
+        $item['imagem_destacada'] = self::format_featured_image($post_id);
+        $item['autor'] = self::format_author($post_id);
+        $item['categorias'] = self::format_evento_categories($post_id);
+        $item['acf'] = self::format_acf_fields($post_id);
         
         if ($post_id !== get_the_ID()) {
             wp_reset_postdata();
         }
         
-        return $evento;
+        return $item;
     }
     
     /**
-     * Formatar categorias específicas
+     * Format specific categories
      */
     public static function format_evento_categories($post_id) {
         $taxonomies = ['categoria_evento', 'category'];
@@ -51,29 +51,22 @@ class Evento_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar múltiplos Eventos
+     * Format list of Eventos
      */
-    public static function format_Eventos($posts) {
-        $Eventos = [];
-        
-        foreach ($posts as $post) {
-            $Eventos[] = self::format_evento($post->ID);
-        }
-        
-        return $Eventos;
+    public static function format_single($post) {
+        return self::format_evento($post->ID);
     }
     
     /**
-     * Formatar resposta de paginação
+     * Format multiple Eventos
      */
-    public static function format_pagination($query, $page, $per_page) {
-        return [
-            'total_Eventos' => $query->found_posts,
-            'total_paginas' => $query->max_num_pages,
-            'pagina_atual' => $page,
-            'Eventos_por_pagina' => $per_page,
-            'tem_proxima_pagina' => $page < $query->max_num_pages,
-            'tem_pagina_anterior' => $page > 1,
-        ];
+    public static function format_multiple($posts) {
+        $items = [];
+        
+        foreach ($posts as $post) {
+            $items[] = self::format_single($post);
+        }
+        
+        return $items;
     }
 }
