@@ -1,8 +1,8 @@
 <?php
 /**
- * Taxonomia: Categoria de Teams
+ * Taxonomia: Categoria de Eventos
  * 
- * Gerado automaticamente em 2025-08-17 14:49:54
+ * Gerado automaticamente em 2025-08-17 20:23:50
  * 
  * @package FuerzaThemeAPI
  */
@@ -11,15 +11,15 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Registrar Taxonomia de Categoria de Teams usando o sistema dinâmico
-Content_Manager::register_taxonomy('categoria_team', ['team'], [
-    'singular_name' => 'Categoria de Team',
-    'plural_name' => 'Categorias de Teams',
-    'description' => 'Categorias para organizar Teams',
+// Registrar Taxonomia de Categoria de Eventos usando o sistema dinâmico
+Content_Manager::register_taxonomy('categoria_evento', ['evento'], [
+    'singular_name' => 'Categoria de Evento',
+    'plural_name' => 'Categorias de Eventos',
+    'description' => 'Categorias para organizar Eventos',
     'hierarchical' => true,
     'public' => true,
     'show_in_rest' => true,
-    'rest_base' => 'categoria_team',
+    'rest_base' => 'categoria_evento',
     'show_ui' => true,
     'show_in_menu' => true,
     'show_in_nav_menus' => true,
@@ -28,7 +28,7 @@ Content_Manager::register_taxonomy('categoria_team', ['team'], [
     'show_admin_column' => true,
     'query_var' => true,
     'rewrite' => [
-        'slug' => 'categoria-team',
+        'slug' => 'categoria-evento',
         'with_front' => false,
         'hierarchical' => true,
     ],
@@ -72,9 +72,9 @@ Content_Manager::register_taxonomy('categoria_team', ['team'], [
     
     // Hooks personalizados
     'hooks' => [
-        'created_categoria_team' => function($term_id) {
+        'created_categoria_evento' => function($term_id) {
             if (function_exists('wp_cache_delete')) {
-                wp_cache_delete('categoria_team_list', 'fuerza_theme');
+                wp_cache_delete('categoria_evento_list', 'fuerza_theme');
             }
         }
     ]

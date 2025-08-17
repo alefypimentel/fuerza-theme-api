@@ -1,8 +1,8 @@
 <?php
 /**
- * Manipulador para rotas de Produtos
+ * Manipulador para rotas de Eventos
  * 
- * Gerado automaticamente em 2025-08-17 01:02:25
+ * Gerado automaticamente em 2025-08-17 20:23:50
  * 
  * @package FuerzaThemeAPI
  */
@@ -11,14 +11,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once get_template_directory() . '/inc/api/formatters/class-produto-formatter.php';
+require_once get_template_directory() . '/inc/api/formatters/class-evento-formatter.php';
 
-class Produto_Handler {
+class Evento_Handler {
     
     /**
-     * Obter Produtos formatados
+     * Obter Eventos formatados
      */
-    public static function get_Produtos($request) {
+    public static function get_Eventos($request) {
         $per_page = $request->get_param('per_page');
         $page = $request->get_param('page');
         $orderby = $request->get_param('orderby');
@@ -28,7 +28,7 @@ class Produto_Handler {
 
         // Montar argumentos da query
         $args = [
-            'post_type' => 'produto',
+            'post_type' => 'evento',
             'post_status' => 'publish',
             'posts_per_page' => $per_page,
             'paged' => $page,
@@ -39,7 +39,7 @@ class Produto_Handler {
         // Adicionar filtros se especificados
         if ($categoria) {
             $args['tax_query'][] = [
-                'taxonomy' => 'categoria_produto',
+                'taxonomy' => 'categoria_evento',
                 'field' => 'slug',
                 'terms' => $categoria,
             ];
@@ -51,46 +51,49 @@ class Produto_Handler {
 
         // Executar query
         $query = new WP_Query($args);
-        $Produtos = [];
+        $Eventos = [];
 
         if ($query->have_posts()) {
-            $Produtos = Produto_Formatter::format_Produtos($query->posts);
+            $Eventos = Evento_Formatter::format_Eventos($query->posts);
         }
 
         // Formatar resposta com paginação
         return [
-            'Produtos' => $Produtos,
-            'paginacao' => Produto_Formatter::format_pagination($query, $page, $per_page),
+            'Eventos' => $Eventos,
+            'paginacao' => Evento_Formatter::format_pagination($query, $page, $per_page),
         ];
     }
     
     /**
-     * Obter um Produto específico
+     * Obter um Evento específico
      */
-    public static function get_produto($request) {
+    public static function get_evento($request) {
         $id = $request->get_param('id');
         
         $post = get_post($id);
         
-        if (!$post || $post->post_type !== 'produto' || $post->post_status !== 'publish') {
+        if (!$post || $post->post_type !== 'evento' || $post->post_status !== 'publish') {
             return new WP_Error(
-                'produto_not_found',
-                'Produto não encontrado.',
+                'evento_not_found',
+                'Evento não encontrado.',
                 ['status' => 404]
             );
         }
         
-        return Produto_Formatter::format_produto($id);
+        return Evento_Formatter::format_evento($id);
     }
     
     /**
      * Validar parâmetros da requisição
      */
-    public static function validate_Produtos_params() {
+    public static function validate_Eventos_params() {
         return [
             'per_page' => [
                 'default' => 10,
                 'sanitize_callback' => 'absint',
+                'validate_callback' => function($param) {
+                    return is_numeric($param) && $param > 0 && $param <= 100;
+                },
             ],
             'page' => [
                 'default' => 1,
@@ -114,13 +117,16 @@ class Produto_Handler {
     }
     
     /**
-     * Validar parâmetros de Produto específico
+     * Validar parâmetros de Evento específico
      */
-    public static function validate_produto_params() {
+    public static function validate_evento_params() {
         return [
             'id' => [
                 'required' => true,
                 'sanitize_callback' => 'absint',
+                'validate_callback' => function($param) {
+                    return is_numeric($param) && $param > 0;
+                },
             ],
         ];
     }
