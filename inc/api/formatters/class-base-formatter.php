@@ -39,19 +39,26 @@ class Base_Formatter {
     /**
      * Formatar dados do autor
      */
-    public static function format_author($post_id = null) {
+    public static function format_author($post_id = null, $include_sensitive_data = false) {
         if ($post_id) {
             $author_id = get_post_field('post_author', $post_id);
         } else {
             $author_id = get_the_author_meta('ID');
         }
         
-        return [
+        $author_data = [
             'id' => (int) $author_id,
             'nome' => get_the_author_meta('display_name', $author_id),
-            'email' => get_the_author_meta('email', $author_id),
             'username' => get_the_author_meta('user_login', $author_id),
+            'avatar' => get_avatar_url($author_id),
         ];
+        
+        // Incluir dados sensíveis apenas se autorizado
+        if ($include_sensitive_data && current_user_can('edit_users')) {
+            $author_data['email'] = get_the_author_meta('email', $author_id);
+        }
+        
+        return $author_data;
     }
     
     /**
@@ -207,6 +214,15 @@ class Base_Formatter {
             $post_id = get_the_ID();
         }
         
+        // Verificar cache primeiro
+        $cached_data = Fuerza_Cache::get_cached_formatted_data($post_id, 'basic_post');
+        if ($cached_data !== false) {
+            if ($post_id !== get_the_ID()) {
+                wp_reset_postdata();
+            }
+            return $cached_data;
+        }
+        
         $data = [
             'id' => $post_id,
             'titulo' => get_the_title($post_id),
@@ -219,6 +235,9 @@ class Base_Formatter {
             'status' => get_post_status($post_id),
             'tipo' => get_post_type($post_id),
         ];
+        
+        // Salvar no cache
+        Fuerza_Cache::cache_formatted_data($post_id, 'basic_post', $data);
         
         if ($post_id !== get_the_ID()) {
             wp_reset_postdata();

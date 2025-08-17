@@ -64,12 +64,13 @@ class API_Manager {
     /**
      * Registra uma nova rota
      */
-    public function add_route($endpoint, $methods, $callback, $args = []) {
+    public function add_route($endpoint, $methods, $callback, $args = [], $permission_callback = null) {
         $this->routes[] = [
             'endpoint' => $endpoint,
             'methods' => $methods,
             'callback' => $callback,
-            'args' => $args
+            'args' => $args,
+            'permission_callback' => $permission_callback
         ];
     }
     
@@ -85,10 +86,30 @@ class API_Manager {
                     'methods' => $route['methods'],
                     'callback' => $route['callback'],
                     'args' => $route['args'],
-                    'permission_callback' => '__return_true'
+                    'permission_callback' => $route['permission_callback'] ?? [$this, 'check_api_permissions']
                 ]
             );
         }
+    }
+    
+    /**
+     * Verificar permissões da API
+     */
+    public function check_api_permissions($request) {
+        // Para rotas públicas de leitura, permitir acesso básico
+        if ($request->get_method() === 'GET') {
+            return true;
+        }
+        
+        // Para outras operações, exigir capacidades específicas
+        return current_user_can('edit_posts');
+    }
+    
+    /**
+     * Permissão pública - sempre permite acesso
+     */
+    public function public_permissions($request) {
+        return true;
     }
     
     /**

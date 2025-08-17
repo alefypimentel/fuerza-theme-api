@@ -23,5 +23,7 @@ $api_manager->add_route(
             'timestamp' => current_time('Y-m-d H:i:s'),
             'version' => '1.0.0'
         ];
-    }
+    },
+    [], // Sem parâmetros
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );

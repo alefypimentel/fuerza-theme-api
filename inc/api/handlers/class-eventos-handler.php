@@ -17,13 +17,21 @@ class Eventos_Handler {
      * Obter eventos formatados
      */
     public static function get_eventos($request) {
-        $per_page = $request->get_param('per_page');
-        $page = $request->get_param('page');
-        $orderby = $request->get_param('orderby');
-        $order = $request->get_param('order');
-        $categoria = $request->get_param('categoria');
-        $tag = $request->get_param('tag');
-        $busca = $request->get_param('busca');
+        $per_page = min(100, max(1, absint($request->get_param('per_page') ?: 10)));
+        $page = max(1, absint($request->get_param('page') ?: 1));
+        $orderby = sanitize_text_field($request->get_param('orderby') ?: 'date');
+        $order = in_array(strtoupper($request->get_param('order') ?: 'DESC'), ['ASC', 'DESC']) 
+            ? strtoupper($request->get_param('order')) : 'DESC';
+        $categoria = sanitize_text_field($request->get_param('categoria') ?: '');
+        $tag = sanitize_text_field($request->get_param('tag') ?: '');
+        $busca = sanitize_text_field($request->get_param('busca') ?: '');
+        
+        // Verificar cache
+        $cache_params = compact('per_page', 'page', 'orderby', 'order', 'categoria', 'tag', 'busca');
+        $cached_result = Fuerza_Cache::get_cached_api_response('/eventos', $cache_params);
+        if ($cached_result !== false) {
+            return $cached_result;
+        }
 
         // Montar argumentos da query
         $args = [
@@ -46,51 +54,68 @@ class Eventos_Handler {
 
         if ($tag) {
             $args['tax_query'][] = [
-                'taxonomy' => 'tag_evento',
+                'taxonomy' => 'post_tag',
                 'field' => 'slug',
                 'terms' => $tag,
             ];
         }
 
-        // Adicionar busca se especificada
         if ($busca) {
             $args['s'] = $busca;
         }
 
-        // Se houver múltiplas queries de taxonomia, usar AND
-        if (isset($args['tax_query']) && count($args['tax_query']) > 1) {
-            $args['tax_query']['relation'] = 'AND';
-        }
-
         // Executar query
         $query = new WP_Query($args);
-        $eventos = [];
-
+        
         if ($query->have_posts()) {
-            $eventos = Eventos_Formatter::format_eventos($query->posts);
+            $eventos = [];
+            while ($query->have_posts()) {
+                $query->the_post();
+                $eventos[] = Eventos_Formatter::format_single(get_post());
+            }
+            wp_reset_postdata();
+            
+            $response = [
+                'eventos' => $eventos,
+                'pagination' => [
+                    'total' => $query->found_posts,
+                    'pages' => $query->max_num_pages,
+                    'current_page' => $page,
+                    'per_page' => $per_page,
+                ],
+                'filters' => [
+                    'categoria' => $categoria,
+                    'tag' => $tag,
+                    'busca' => $busca,
+                    'orderby' => $orderby,
+                    'order' => $order,
+                ]
+            ];
+            
+            // Cache da resposta
+            Fuerza_Cache::cache_api_response('/eventos', $cache_params, $response);
+            
+            return $response;
         }
-
-        // Formatar resposta com paginação
-        return [
-            'eventos' => $eventos,
-            'paginacao' => Eventos_Formatter::format_pagination($query, $page, $per_page),
-        ];
+        
+        wp_reset_postdata();
+        return new WP_Error('no_events', 'Nenhum evento encontrado', ['status' => 404]);
     }
     
     /**
-     * Obter um evento específico
+     * Obter evento específico
      */
     public static function get_evento($request) {
-        $id = $request->get_param('id');
+        $id = absint($request->get_param('id'));
         
-        $post = get_post($id);
+        if (!$id) {
+            return new WP_Error('invalid_id', 'ID do evento é obrigatório', ['status' => 400]);
+        }
         
-        if (!$post || $post->post_type !== 'evento' || $post->post_status !== 'publish') {
-            return new WP_Error(
-                'evento_not_found',
-                'Evento não encontrado.',
-                ['status' => 404]
-            );
+        $evento = get_post($id);
+        
+        if (!$evento || $evento->post_type !== 'evento' || $evento->post_status !== 'publish') {
+            return new WP_Error('event_not_found', 'Evento não encontrado', ['status' => 404]);
         }
         
         return Eventos_Formatter::format_evento($id);
@@ -104,34 +129,21 @@ class Eventos_Handler {
             'per_page' => [
                 'default' => 10,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => function($param) {
-                    return is_numeric($param) && $param > 0 && $param <= 100;
-                },
                 'description' => 'Número de eventos por página (máximo 100)',
             ],
             'page' => [
                 'default' => 1,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => function($param) {
-                    return is_numeric($param) && $param > 0;
-                },
                 'description' => 'Número da página',
             ],
             'orderby' => [
                 'default' => 'date',
                 'sanitize_callback' => 'sanitize_text_field',
-                'validate_callback' => function($param) {
-                    $allowed = ['date', 'title', 'menu_order', 'rand', 'modified'];
-                    return in_array($param, $allowed);
-                },
                 'description' => 'Ordenar por: date, title, menu_order, rand, modified',
             ],
             'order' => [
                 'default' => 'DESC',
                 'sanitize_callback' => 'sanitize_text_field',
-                'validate_callback' => function($param) {
-                    return in_array(strtoupper($param), ['ASC', 'DESC']);
-                },
                 'description' => 'Ordem: ASC ou DESC',
             ],
             'categoria' => [
@@ -144,7 +156,7 @@ class Eventos_Handler {
             ],
             'busca' => [
                 'sanitize_callback' => 'sanitize_text_field',
-                'description' => 'Buscar eventos por termo',
+                'description' => 'Buscar eventos por termo (2-100 caracteres)',
             ],
         ];
     }
@@ -157,9 +169,6 @@ class Eventos_Handler {
             'id' => [
                 'required' => true,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => function($param) {
-                    return is_numeric($param) && $param > 0;
-                },
                 'description' => 'ID do evento',
             ],
         ];

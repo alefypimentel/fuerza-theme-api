@@ -19,7 +19,8 @@ $api_manager->add_route(
     '/eventos',
     'GET',
     [Eventos_Handler::class, 'get_eventos'],
-    Eventos_Handler::validate_eventos_params()
+    Eventos_Handler::validate_eventos_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );
 
 // Registrar rota para obter evento específico
@@ -27,5 +28,6 @@ $api_manager->add_route(
     '/eventos/(?P<id>\d+)',
     'GET',
     [Eventos_Handler::class, 'get_evento'],
-    Eventos_Handler::validate_evento_params()
+    Eventos_Handler::validate_evento_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );

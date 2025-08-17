@@ -1,6 +1,6 @@
 <?php
 /**
- * Formatador para dados de eventos
+ * Formatador para dados de Eventos
  * 
  * @package FuerzaThemeAPI
  */
@@ -27,12 +27,15 @@ class Eventos_Formatter extends Base_Formatter {
         // Dados básicos do post
         $evento = self::format_basic_post_data($post_id);
         
-        // Adicionar dados específicos de eventos
+        // Adicionar dados específicos
         $evento['imagem_destacada'] = self::format_featured_image($post_id);
         $evento['autor'] = self::format_author($post_id);
         $evento['categorias'] = self::format_evento_categories($post_id);
-        $evento['tags'] = self::format_evento_tags($post_id);
         $evento['acf'] = self::format_acf_fields($post_id);
+        
+        // Dados específicos de eventos
+        $evento['data_evento'] = self::get_event_date($post_id);
+        $evento['localizacao'] = self::get_event_location($post_id);
         
         if ($post_id !== get_the_ID()) {
             wp_reset_postdata();
@@ -42,7 +45,7 @@ class Eventos_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar categorias específicas de eventos
+     * Formatar categorias específicas
      */
     public static function format_evento_categories($post_id) {
         $taxonomies = ['categoria_evento', 'category'];
@@ -50,37 +53,69 @@ class Eventos_Formatter extends Base_Formatter {
     }
     
     /**
-     * Formatar tags específicas de eventos
+     * Formatar lista de eventos
      */
-    public static function format_evento_tags($post_id) {
-        $taxonomies = ['tag_evento', 'post_tag'];
-        return self::format_terms($post_id, $taxonomies);
+    public static function format_single($post) {
+        return self::format_evento($post->ID);
+    }
+    
+    /**
+     * Obter data do evento (via ACF se disponível)
+     */
+    private static function get_event_date($post_id) {
+        // Tentar obter via ACF primeiro
+        if (function_exists('get_field')) {
+            $data_evento = get_field('data_evento', $post_id);
+            if ($data_evento) {
+                return $data_evento;
+            }
+            
+            // Tentar campo 'agenda' mencionado no CPT
+            $agenda = get_field('agenda', $post_id);
+            if ($agenda) {
+                return $agenda;
+            }
+        }
+        
+        // Fallback para data de publicação
+        return get_the_date('Y-m-d H:i:s', $post_id);
+    }
+    
+    /**
+     * Obter localização do evento (via ACF se disponível)
+     */
+    private static function get_event_location($post_id) {
+        if (function_exists('get_field')) {
+            $localizacao = get_field('localizacao', $post_id);
+            if ($localizacao) {
+                return $localizacao;
+            }
+            
+            // Tentar outros nomes comuns
+            $local = get_field('local', $post_id);
+            if ($local) {
+                return $local;
+            }
+            
+            $endereco = get_field('endereco', $post_id);
+            if ($endereco) {
+                return $endereco;
+            }
+        }
+        
+        return null;
     }
     
     /**
      * Formatar múltiplos eventos
      */
-    public static function format_eventos($posts) {
+    public static function format_multiple($posts) {
         $eventos = [];
         
         foreach ($posts as $post) {
-            $eventos[] = self::format_evento($post->ID);
+            $eventos[] = self::format_single($post);
         }
         
         return $eventos;
-    }
-    
-    /**
-     * Formatar resposta de paginação
-     */
-    public static function format_pagination($query, $page, $per_page) {
-        return [
-            'total_eventos' => $query->found_posts,
-            'total_paginas' => $query->max_num_pages,
-            'pagina_atual' => $page,
-            'eventos_por_pagina' => $per_page,
-            'tem_proxima_pagina' => $page < $query->max_num_pages,
-            'tem_pagina_anterior' => $page > 1,
-        ];
     }
 }

@@ -21,7 +21,8 @@ $api_manager->add_route(
     '/Produtos',
     'GET',
     [Produto_Handler::class, 'get_Produtos'],
-    Produto_Handler::validate_Produtos_params()
+    Produto_Handler::validate_Produtos_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );
 
 // Registrar rota para obter Produto específico
@@ -29,5 +30,6 @@ $api_manager->add_route(
     '/Produtos/(?P<id>\d+)',
     'GET',
     [Produto_Handler::class, 'get_produto'],
-    Produto_Handler::validate_produto_params()
+    Produto_Handler::validate_produto_params(),
+    [$api_manager, 'public_permissions'] // Permitir acesso público
 );

@@ -1,8 +1,8 @@
 <?php
 /**
- * Manipulador para rotas de Produtos
+ * Manipulador para rotas de Teams
  * 
- * Gerado automaticamente em 2025-08-17 01:02:25
+ * Gerado automaticamente em 2025-08-17 14:49:54
  * 
  * @package FuerzaThemeAPI
  */
@@ -11,14 +11,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once get_template_directory() . '/inc/api/formatters/class-produto-formatter.php';
+require_once get_template_directory() . '/inc/api/formatters/class-team-formatter.php';
 
-class Produto_Handler {
+class Team_Handler {
     
     /**
-     * Obter Produtos formatados
+     * Obter Teams formatados
      */
-    public static function get_Produtos($request) {
+    public static function get_Teams($request) {
         $per_page = $request->get_param('per_page');
         $page = $request->get_param('page');
         $orderby = $request->get_param('orderby');
@@ -28,7 +28,7 @@ class Produto_Handler {
 
         // Montar argumentos da query
         $args = [
-            'post_type' => 'produto',
+            'post_type' => 'team',
             'post_status' => 'publish',
             'posts_per_page' => $per_page,
             'paged' => $page,
@@ -39,7 +39,7 @@ class Produto_Handler {
         // Adicionar filtros se especificados
         if ($categoria) {
             $args['tax_query'][] = [
-                'taxonomy' => 'categoria_produto',
+                'taxonomy' => 'categoria_team',
                 'field' => 'slug',
                 'terms' => $categoria,
             ];
@@ -51,42 +51,42 @@ class Produto_Handler {
 
         // Executar query
         $query = new WP_Query($args);
-        $Produtos = [];
+        $Teams = [];
 
         if ($query->have_posts()) {
-            $Produtos = Produto_Formatter::format_Produtos($query->posts);
+            $Teams = Team_Formatter::format_Teams($query->posts);
         }
 
         // Formatar resposta com paginação
         return [
-            'Produtos' => $Produtos,
-            'paginacao' => Produto_Formatter::format_pagination($query, $page, $per_page),
+            'Teams' => $Teams,
+            'paginacao' => Team_Formatter::format_pagination($query, $page, $per_page),
         ];
     }
     
     /**
-     * Obter um Produto específico
+     * Obter um Team específico
      */
-    public static function get_produto($request) {
+    public static function get_team($request) {
         $id = $request->get_param('id');
         
         $post = get_post($id);
         
-        if (!$post || $post->post_type !== 'produto' || $post->post_status !== 'publish') {
+        if (!$post || $post->post_type !== 'team' || $post->post_status !== 'publish') {
             return new WP_Error(
-                'produto_not_found',
-                'Produto não encontrado.',
+                'team_not_found',
+                'Team não encontrado.',
                 ['status' => 404]
             );
         }
         
-        return Produto_Formatter::format_produto($id);
+        return Team_Formatter::format_team($id);
     }
     
     /**
      * Validar parâmetros da requisição
      */
-    public static function validate_Produtos_params() {
+    public static function validate_Teams_params() {
         return [
             'per_page' => [
                 'default' => 10,
@@ -114,9 +114,9 @@ class Produto_Handler {
     }
     
     /**
-     * Validar parâmetros de Produto específico
+     * Validar parâmetros de Team específico
      */
-    public static function validate_produto_params() {
+    public static function validate_team_params() {
         return [
             'id' => [
                 'required' => true,

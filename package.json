@@ -1,0 +1,101 @@
+{
+  "name": "fuerza-theme-api",
+  "version": "1.0.1",
+  "description": "WordPress Theme with Advanced API Management, Monitoring, and Custom Post Types",
+  "keywords": [
+    "wordpress",
+    "theme",
+    "api",
+    "rest-api",
+    "custom-post-types",
+    "monitoring",
+    "rate-limiting",
+    "cache"
+  ],
+  "author": "Fuerza Development Team",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "echo '🚀 Starting Fuerza Theme development mode...' && npm run watch",
+    "build": "echo '🔨 Building Fuerza Theme for production...' && npm run build:all",
+    "watch": "npm-run-all --parallel watch:*",
+    "build:all": "npm-run-all build:css build:js build:assets",
+    
+    "build:css": "node scripts/build-css.js",
+    "build:js": "node scripts/build-js.js", 
+    "build:assets": "node scripts/build-assets.js",
+    
+    "watch:css": "chokidar 'assets/src/scss/**/*.scss' -c 'npm run build:css'",
+    "watch:js": "chokidar 'assets/src/js/**/*.js' -c 'npm run build:js'",
+    "watch:php": "chokidar '**/*.php' --ignore 'node_modules/**' -c 'echo \"⚡ PHP file changed: {path}\"'",
+    
+    "test": "npm run test:api && npm run test:php",
+    "test:api": "node scripts/test-api.js",
+    "test:php": "echo '🧪 Running PHP tests...' && php scripts/test-php.php",
+    
+    "lint": "npm run lint:css && npm run lint:js && npm run lint:php",
+    "lint:css": "stylelint 'assets/src/scss/**/*.scss'",
+    "lint:js": "eslint assets/src/js/**/*.js",
+    "lint:php": "php scripts/lint-php.php",
+    
+    "deploy": "npm run build && node scripts/deploy.js",
+    "release": "npm run build && npm run test && node scripts/release.js",
+    
+    "api:test": "node scripts/api-test.js",
+    "api:docs": "node scripts/generate-api-docs.js",
+    "api:routes": "node scripts/list-routes.js",
+    "api:clear-cache": "php scripts/clear-cache.php",
+    "api:reset-limits": "php scripts/reset-rate-limits.php",
+    
+    "db:migrate": "php scripts/db-migrate.php",
+    "db:seed": "php scripts/db-seed.php",
+    "db:backup": "node scripts/db-backup.js",
+    "db:restore": "node scripts/db-restore.js",
+    
+    "cpt:create": "node scripts/create-cpt.js",
+    "cpt:remove": "node scripts/remove-cpt.js",
+    "cpt:list": "php scripts/list-cpts.php",
+    
+    "theme:install": "npm run db:migrate && npm run cpt:seed && npm run api:clear-cache",
+    "theme:update": "npm run build && npm run db:migrate && npm run api:clear-cache",
+    "theme:reset": "npm run api:reset-limits && npm run api:clear-cache && npm run db:migrate",
+    
+    "monitor:stats": "php scripts/monitor-stats.php",
+    "monitor:logs": "tail -f ../../debug.log",
+    "monitor:clear": "echo '' > ../../debug.log && echo '🧹 Debug log cleared'",
+    
+    "help": "node scripts/help.js",
+    "docs": "node scripts/generate-docs.js"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.70.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "eslint": "^8.56.0",
+    "stylelint": "^16.1.0",
+    "stylelint-config-standard-scss": "^13.0.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1",
+    "boxen": "^5.1.2"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/fuerza-theme-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/fuerza-theme-api/issues"
+  },
+  "homepage": "https://github.com/your-org/fuerza-theme-api#readme"
+}
