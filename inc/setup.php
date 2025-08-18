@@ -7,18 +7,9 @@ function fuerza_theme_setup() {
 add_action('after_setup_theme', 'fuerza_theme_setup');
 
 /**
- * Inicializar sistema de monitoramento
+ * Configurações básicas do tema
+ * Sistema simplificado sem monitoramento
  */
-function fuerza_initialize_monitoring() {
-    // Carregar o monitor class se não estiver carregado
-    if (!class_exists('Fuerza_Monitor')) {
-        require_once get_template_directory() . '/inc/class-monitor.php';
-    }
-    
-    // Inicializar as tabelas do banco de dados
-    Fuerza_Monitor::initialize_database();
-}
-add_action('init', 'fuerza_initialize_monitoring');
 
 /**
  * Flush rewrite rules quando necessário

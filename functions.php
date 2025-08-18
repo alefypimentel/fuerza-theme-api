@@ -28,14 +28,7 @@ require_once get_template_directory() . '/inc/rest-api.php';
 require_once get_template_directory() . '/inc/admin.php';
 require_once get_template_directory() . '/inc/helpers.php';
 
-// Load logging, monitoring, cache, rate limiting, documentation and performance systems
-require_once get_template_directory() . '/inc/class-logger.php';
-require_once get_template_directory() . '/inc/class-monitor.php';
-require_once get_template_directory() . '/inc/class-cache.php';
-require_once get_template_directory() . '/inc/class-rate-limiter.php';
-require_once get_template_directory() . '/inc/class-api-docs.php';
-require_once get_template_directory() . '/inc/class-performance.php';
-require_once get_template_directory() . '/inc/class-api-tester.php';
+// Sistema de API simplificado (sem monitoramento, cache e rate limiting)
 
 // Load administrative dashboard
 require_once get_template_directory() . '/inc/admin-dashboard.php';

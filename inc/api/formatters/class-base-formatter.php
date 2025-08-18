@@ -214,14 +214,7 @@ class Base_Formatter {
             $post_id = get_the_ID();
         }
         
-        // Verificar cache primeiro
-        $cached_data = Fuerza_Cache::get_cached_formatted_data($post_id, 'basic_post');
-        if ($cached_data !== false) {
-            if ($post_id !== get_the_ID()) {
-                wp_reset_postdata();
-            }
-            return $cached_data;
-        }
+        // Sistema simplificado sem cache
         
         $data = [
             'id' => $post_id,
@@ -236,8 +229,7 @@ class Base_Formatter {
             'tipo' => get_post_type($post_id),
         ];
         
-        // Salvar no cache
-        Fuerza_Cache::cache_formatted_data($post_id, 'basic_post', $data);
+        // Dados formatados (sem cache)
         
         if ($post_id !== get_the_ID()) {
             wp_reset_postdata();

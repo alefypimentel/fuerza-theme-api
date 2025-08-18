@@ -30,10 +30,7 @@ ${chalk.yellow.bold('🔍 LINTING:')}
 
 ${chalk.yellow.bold('🌐 API:')}
   ${chalk.green('npm run api:test')}    - Testa todas as rotas da API
-  ${chalk.green('npm run api:docs')}    - Gera documentação da API
   ${chalk.green('npm run api:routes')}  - Lista todas as rotas
-  ${chalk.green('npm run api:clear-cache')} - Limpa cache da API
-  ${chalk.green('npm run api:reset-limits')} - Reset rate limiting
 
 ${chalk.yellow.bold('🗄️  BANCO DE DADOS:')}
   ${chalk.green('npm run db:migrate')}  - Executa migrações
@@ -51,10 +48,9 @@ ${chalk.yellow.bold('🎯 TEMA:')}
   ${chalk.green('npm run theme:update')}  - Atualiza tema existente
   ${chalk.green('npm run theme:reset')}   - Reset completo do tema
 
-${chalk.yellow.bold('📊 MONITORAMENTO:')}
-  ${chalk.green('npm run monitor:stats')} - Mostra estatísticas
-  ${chalk.green('npm run monitor:logs')}  - Acompanha logs em tempo real
-  ${chalk.green('npm run monitor:clear')} - Limpa logs de debug
+${chalk.yellow.bold('⚙️  SISTEMA:')}
+  ${chalk.green('npm run system:check')} - Verifica status do sistema
+  ${chalk.green('npm run system:info')}  - Informações do ambiente
 
 ${chalk.yellow.bold('🚀 DEPLOY:')}
   ${chalk.green('npm run deploy')}      - Deploy para produção
@@ -62,7 +58,6 @@ ${chalk.yellow.bold('🚀 DEPLOY:')}
 
 ${chalk.yellow.bold('📚 DOCUMENTAÇÃO:')}
   ${chalk.green('npm run help')}        - Mostra esta ajuda
-  ${chalk.green('npm run docs')}        - Gera documentação completa
 
 ${chalk.cyan('💡 Dica: Execute qualquer comando com --help para mais detalhes')}
 `;
