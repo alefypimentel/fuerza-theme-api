@@ -1,8 +1,8 @@
 <?php
 /**
- * Handler for routes of Eventos
+ * Handler for routes of Produtos
  * 
- * Auto-generated on 2025-08-17 20:49:44
+ * Auto-generated on 2025-08-18 20:26:43
  * 
  * @package FuerzaThemeAPI
  */
@@ -11,14 +11,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once get_template_directory() . '/inc/api/formatters/class-evento-formatter.php';
+require_once get_template_directory() . '/inc/api/formatters/class-produto-formatter.php';
 
-class Evento_Handler {
+class Produto_Handler {
     
     /**
      * Get formatted
      */
-    public static function get_Eventos($request) {
+    public static function get_Produtos($request) {
         $per_page = $request->get_param('per_page');
         $page = $request->get_param('page');
         $orderby = $request->get_param('orderby');
@@ -30,7 +30,7 @@ class Evento_Handler {
 
         // Montar argumentos da query
         $args = [
-            'post_type' => 'evento',
+            'post_type' => 'produto',
             'post_status' => 'publish',
             'posts_per_page' => $per_page,
             'paged' => $page,
@@ -44,7 +44,7 @@ class Evento_Handler {
         // Adicionar filtros se especificados
         if ($categoria) {
             $args['tax_query'][] = [
-                'taxonomy' => 'categoria_evento',
+                'taxonomy' => 'categoria_produto',
                 'field' => 'slug',
                 'terms' => $categoria,
             ];
@@ -61,7 +61,7 @@ class Evento_Handler {
             $items = [];
             while ($query->have_posts()) {
                 $query->the_post();
-                $formatted_post = Evento_Formatter::format_single(get_post());
+                $formatted_post = Produto_Formatter::format_single(get_post());
                 
                 // Aplicar filtros de tradução aos dados formatados
                 $formatted_post = apply_filters('fuerza_api_format_post', $formatted_post, get_post());
@@ -77,7 +77,7 @@ class Evento_Handler {
             wp_reset_postdata();
             
             $response_data = [
-                'eventos' => $items,
+                'produtos' => $items,
                 'pagination' => [
                     'total' => $query->found_posts,
                     'pages' => $query->max_num_pages,
@@ -102,28 +102,28 @@ class Evento_Handler {
         }
         
         wp_reset_postdata();
-        return new WP_Error('no_eventos', 'Nenhum evento encontrado', ['status' => 404]);
+        return new WP_Error('no_produtos', 'Nenhum produto encontrado', ['status' => 404]);
     }
     
     /**
      * Get specific
      */
-    public static function get_evento($request) {
+    public static function get_produto($request) {
         $id = absint($request->get_param('id'));
         
         if (!$id) {
-            return new WP_Error('invalid_id', 'ID do evento é obrigatório', ['status' => 400]);
+            return new WP_Error('invalid_id', 'ID do produto é obrigatório', ['status' => 400]);
         }
         
         $item = get_post($id);
         
-        if (!$item || $item->post_type !== 'evento' || $item->post_status !== 'publish') {
-            return new WP_Error('evento_not_found', 'Evento não encontrado', ['status' => 404]);
+        if (!$item || $item->post_type !== 'produto' || $item->post_status !== 'publish') {
+            return new WP_Error('produto_not_found', 'Produto não encontrado', ['status' => 404]);
         }
         
         $include_translations = $request->get_param('include_translations');
         
-        $formatted_data = Evento_Formatter::format_evento($id);
+        $formatted_data = Produto_Formatter::format_produto($id);
         
         // Aplicar filtros de tradução
         $formatted_data = apply_filters('fuerza_api_format_post', $formatted_data, $item);
@@ -140,7 +140,7 @@ class Evento_Handler {
     /**
      * Validate parameters da requisição
      */
-    public static function validate_Eventos_params() {
+    public static function validate_Produtos_params() {
         return [
             'per_page' => [
                 'default' => 10,
@@ -178,9 +178,9 @@ class Evento_Handler {
     }
     
     /**
-     * Validate parameters de Evento específico
+     * Validate parameters de Produto específico
      */
-    public static function validate_evento_params() {
+    public static function validate_produto_params() {
         return [
             'id' => [
                 'required' => true,

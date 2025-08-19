@@ -29,6 +29,8 @@ require_once get_template_directory() . '/inc/admin.php';
 require_once get_template_directory() . '/inc/helpers.php';
 
 // Sistema de API simplificado (sem monitoramento, cache e rate limiting)
+// Load translation support system
+require_once get_template_directory() . '/inc/class-translation-support.php';
 
 // Load administrative dashboard
 require_once get_template_directory() . '/inc/admin-dashboard.php';

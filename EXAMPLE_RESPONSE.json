@@ -1,0 +1,90 @@
+{
+  "produtos": [
+    {
+      "id": 62,
+      "titulo": "Produto 1",
+      "conteudo": "<!-- wp:paragraph -->\n<p>Esse é um produto</p>\n<!-- /wp:paragraph -->",
+      "resumo": "Esse é um produto",
+      "data_publicacao": "2025-08-18 17:27:06",
+      "data_modificacao": "2025-08-18 17:27:06",
+      "slug": "produto-1",
+      "link": "https://wordpress.local/produto/produto-1/",
+      "status": "publish",
+      "tipo": "produto",
+      "language": "pt-br",
+      "translations": {
+        "en": {
+          "id": "68",
+          "language": "en",
+          "url": "https://wordpress.local/en/produto/product-1/"
+        },
+        "es": {
+          "id": "70",
+          "language": "es",
+          "url": "https://wordpress.local/es/produto/producto-1/"
+        }
+      },
+      "is_default_language": true,
+      "translated_content": {
+        "en": {
+          "id": 68,
+          "language": "en",
+          "titulo": "Product 1",
+          "conteudo": "<p>This is a product</p>",
+          "resumo": "This is a product",
+          "slug": "product-1",
+          "url": "https://wordpress.local/en/produto/product-1/",
+          "api_url": "https://wordpress.local/wp-json/fuerza-theme/v1/produto/68",
+          "data_publicacao": "2025-08-18 17:27:06",
+          "data_modificacao": "2025-08-18 17:27:06"
+        },
+        "es": {
+          "id": 70,
+          "language": "es",
+          "titulo": "Producto 1",
+          "conteudo": "<p>Este es un producto</p>",
+          "resumo": "Este es un producto",
+          "slug": "producto-1",
+          "url": "https://wordpress.local/es/produto/producto-1/",
+          "api_url": "https://wordpress.local/wp-json/fuerza-theme/v1/produto/70",
+          "data_publicacao": "2025-08-18 17:27:06",
+          "data_modificacao": "2025-08-18 17:27:06"
+        }
+      },
+      "translated_versions": {
+        "en": {
+          "id": "68",
+          "url": "https://wordpress.local/en/produto/product-1/",
+          "language": "en",
+          "api_url": "https://wordpress.local/wp-json/fuerza-theme/v1/produto/68"
+        },
+        "es": {
+          "id": "70",
+          "url": "https://wordpress.local/es/produto/producto-1/",
+          "language": "es",
+          "api_url": "https://wordpress.local/wp-json/fuerza-theme/v1/produto/70"
+        }
+      },
+      "imagem_destacada": null,
+      "autor": {
+        "id": 1,
+        "nome": "admin",
+        "username": "admin",
+        "avatar": "https://secure.gravatar.com/avatar/f17bd462ac844f899852b01b0cd2237cd97beb7a8642b99c5d27fea597d976e8?s=96&d=mm&r=g"
+      },
+      "categorias": [],
+      "acf": []
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "pages": 1,
+    "current_page": 1,
+    "per_page": 10
+  },
+  "language_info": {
+    "current_language": "pt-br",
+    "available_languages": ["pt-br", "en", "es"],
+    "requested_language": null
+  }
+}

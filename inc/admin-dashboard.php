@@ -184,6 +184,27 @@ class Fuerza_Admin_Dashboard {
                 <h3>URL Base:</h3>
                 <code><?php echo home_url('/wp-json/' . API_Manager::get_namespace()); ?></code>
                 
+                <?php
+                // Verificar suporte a tradução
+                if (class_exists('Fuerza_Translation_Support')) {
+                    $translation_support = Fuerza_Translation_Support::get_instance();
+                    if ($translation_support->has_translation_plugin()) {
+                        $translation_info = $translation_support->get_translation_info();
+                        ?>
+                        <h3>🌍 Suporte a Tradução:</h3>
+                        <p><strong>Plugin Ativo:</strong> <?php echo ucfirst($translation_info['plugin']); ?></p>
+                        <p><strong>Idioma Padrão:</strong> <?php echo $translation_info['default_language']; ?></p>
+                        <p><strong>Idiomas Disponíveis:</strong> <?php echo implode(', ', array_keys($translation_info['languages'])); ?></p>
+                        <?php
+                    } else {
+                        ?>
+                        <h3>🌍 Suporte a Tradução:</h3>
+                        <p><em>Nenhum plugin de tradução detectado. Instale WPML ou Polylang para ativar o suporte multilíngue.</em></p>
+                        <?php
+                    }
+                }
+                ?>
+                
                 <div class="fuerza-api-links">
                     <a href="<?php echo home_url('/wp-json/' . API_Manager::get_namespace() . '/ping'); ?>" target="_blank" class="fuerza-api-link">
                         🏓 Testar API (Ping)
@@ -205,7 +226,38 @@ class Fuerza_Admin_Dashboard {
                     <li><strong>GET</strong> <code>/ping</code> - Verifica status da API</li>
                     <li><strong>GET</strong> <code>/eventos</code> - Lista eventos</li>
                     <li><strong>GET</strong> <code>/eventos/{id}</code> - Obter evento específico</li>
+                    <?php
+                    // Mostrar endpoints de tradução se disponível
+                    if (class_exists('Fuerza_Translation_Support')) {
+                        $translation_support = Fuerza_Translation_Support::get_instance();
+                        if ($translation_support->has_translation_plugin()) {
+                            ?>
+                            <li><strong>GET</strong> <code>/languages</code> - Lista idiomas disponíveis</li>
+                            <li><strong>POST</strong> <code>/language/{lang}</code> - Alterna idioma</li>
+                            <?php
+                        }
+                    }
+                    ?>
                 </ul>
+                
+                <?php
+                // Adicionar informações sobre parâmetros multilíngues
+                if (class_exists('Fuerza_Translation_Support')) {
+                    $translation_support = Fuerza_Translation_Support::get_instance();
+                    if ($translation_support->has_translation_plugin()) {
+                        ?>
+                        <h4>🌍 Parâmetros Multilíngues:</h4>
+                        <ul>
+                            <li><code>?lang=pt</code> - Filtrar por idioma específico</li>
+                            <li><code>?lang=all</code> - Retornar todos os idiomas</li>
+                            <li><code>?include_translations=full</code> - Conteúdo completo das traduções (padrão)</li>
+                            <li><code>?include_translations=links</code> - Apenas links das traduções (mais rápido)</li>
+                        </ul>
+                        <p><strong>🚀 Novidade:</strong> O parâmetro <code>include_translations=full</code> retorna todo o conteúdo traduzido em uma única requisição!</p>
+                        <?php
+                    }
+                }
+                ?>
                 
                 <p><em>Para mais detalhes sobre parâmetros e respostas, consulte a documentação técnica ou teste diretamente os endpoints.</em></p>
             </div>

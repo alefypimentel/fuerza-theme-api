@@ -97,6 +97,9 @@ class CPT_Manager {
             'menu_position' => 20,
         ];
         
+        // Adicionar suporte a tradução automático
+        $this->add_translation_support($post_type, $defaults);
+        
         // Merge settings
         $args = wp_parse_args($config, $defaults);
         
@@ -232,6 +235,89 @@ class CPT_Manager {
      */
     public static function get_cpt_config($post_type) {
         return self::$registered_cpts[$post_type] ?? null;
+    }
+    
+    /**
+     * Adicionar suporte automático a tradução
+     */
+    private function add_translation_support($post_type, &$defaults) {
+        // Verificar se há plugin de tradução ativo
+        $translation_support = class_exists('Fuerza_Translation_Support') ? Fuerza_Translation_Support::get_instance() : null;
+        
+        if (!$translation_support || !$translation_support->has_translation_plugin()) {
+            return;
+        }
+        
+        // Configurações específicas para tradução
+        if ($translation_support->is_wpml_active()) {
+            // Para WPML - adicionar suporte específico
+            add_action('init', function() use ($post_type) {
+                // Registrar strings para tradução
+                do_action('wpml_register_single_string', 'fuerza-theme-cpt', "Post Type {$post_type}", $post_type);
+                
+                // Configurar como traduzível
+                if (function_exists('icl_register_string')) {
+                    icl_register_string('fuerza-theme-cpt', "Post Type {$post_type} Label", ucfirst($post_type));
+                }
+            }, 25);
+        }
+        
+        if ($translation_support->is_polylang_active()) {
+            // Para Polylang - configurações específicas
+            add_action('init', function() use ($post_type) {
+                // Polylang detecta CPTs automaticamente quando show_in_rest = true
+                // Apenas certificar que está configurado corretamente
+                if (function_exists('pll_register_string')) {
+                    pll_register_string("cpt_{$post_type}_label", ucfirst($post_type), 'Fuerza Theme');
+                }
+            }, 25);
+        }
+        
+        // Adicionar suporte REST API multilíngue
+        $defaults['show_in_rest'] = true;
+        
+        // Hook para após registro do CPT
+        add_action('registered_post_type', function($post_type_registered, $post_type_object) use ($post_type) {
+            if ($post_type_registered === $post_type) {
+                $this->configure_cpt_translation($post_type);
+            }
+        }, 10, 2);
+    }
+    
+    /**
+     * Configurar tradução após registro do CPT
+     */
+    private function configure_cpt_translation($post_type) {
+        $translation_support = class_exists('Fuerza_Translation_Support') ? Fuerza_Translation_Support::get_instance() : null;
+        
+        if (!$translation_support || !$translation_support->has_translation_plugin()) {
+            return;
+        }
+        
+        // Para WPML
+        if ($translation_support->is_wpml_active()) {
+            // Configurar o CPT como traduzível no WPML
+            global $sitepress_settings;
+            if (isset($sitepress_settings['custom_posts_sync_option'])) {
+                $sitepress_settings['custom_posts_sync_option'][$post_type] = 1; // 1 = traduzir, 2 = não traduzir
+            }
+            
+            // Aplicar filtros WPML
+            add_filter('wpml_get_translatable_types', function($types) use ($post_type) {
+                $types[] = $post_type;
+                return $types;
+            });
+        }
+        
+        // Para Polylang
+        if ($translation_support->is_polylang_active()) {
+            // Polylang gerencia automaticamente CPTs com show_in_rest = true
+            // Adicionar filtros específicos se necessário
+            add_filter('pll_get_post_types', function($post_types) use ($post_type) {
+                $post_types[$post_type] = $post_type;
+                return $post_types;
+            });
+        }
     }
 }
 
