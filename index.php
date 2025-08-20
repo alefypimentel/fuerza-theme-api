@@ -48,11 +48,6 @@ if (!defined('ABSPATH')) {
             margin-bottom: 2rem;
             opacity: 0.9;
         }
-
-        a {
-            color: white;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
@@ -60,9 +55,6 @@ if (!defined('ABSPATH')) {
         <h1 class="api-title"><?php bloginfo('name'); ?></h1>
         <p class="api-description">
             <?php echo get_bloginfo('description') ?: 'API REST Profissional com WordPress'; ?>
-        </p>
-        <p>
-            Created by <a href="https://www.alefy.devr" target="_blank">Alefy Pimentel Ferreira</a>
         </p>
         <?php wp_footer(); ?>
     </div>

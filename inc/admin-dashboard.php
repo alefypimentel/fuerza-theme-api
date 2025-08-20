@@ -219,50 +219,6 @@ class Fuerza_Admin_Dashboard {
             </div>
             
             <div class="fuerza-card">
-                <h2>🔗 Endpoints Disponíveis</h2>
-                <p>Principais endpoints da API:</p>
-                
-                <ul>
-                    <li><strong>GET</strong> <code>/ping</code> - Verifica status da API</li>
-                    <li><strong>GET</strong> <code>/eventos</code> - Lista eventos</li>
-                    <li><strong>GET</strong> <code>/eventos/{id}</code> - Obter evento específico</li>
-                    <?php
-                    // Mostrar endpoints de tradução se disponível
-                    if (class_exists('Fuerza_Translation_Support')) {
-                        $translation_support = Fuerza_Translation_Support::get_instance();
-                        if ($translation_support->has_translation_plugin()) {
-                            ?>
-                            <li><strong>GET</strong> <code>/languages</code> - Lista idiomas disponíveis</li>
-                            <li><strong>POST</strong> <code>/language/{lang}</code> - Alterna idioma</li>
-                            <?php
-                        }
-                    }
-                    ?>
-                </ul>
-                
-                <?php
-                // Adicionar informações sobre parâmetros multilíngues
-                if (class_exists('Fuerza_Translation_Support')) {
-                    $translation_support = Fuerza_Translation_Support::get_instance();
-                    if ($translation_support->has_translation_plugin()) {
-                        ?>
-                        <h4>🌍 Parâmetros Multilíngues:</h4>
-                        <ul>
-                            <li><code>?lang=pt</code> - Filtrar por idioma específico</li>
-                            <li><code>?lang=all</code> - Retornar todos os idiomas</li>
-                            <li><code>?include_translations=full</code> - Conteúdo completo das traduções (padrão)</li>
-                            <li><code>?include_translations=links</code> - Apenas links das traduções (mais rápido)</li>
-                        </ul>
-                        <p><strong>🚀 Novidade:</strong> O parâmetro <code>include_translations=full</code> retorna todo o conteúdo traduzido em uma única requisição!</p>
-                        <?php
-                    }
-                }
-                ?>
-                
-                <p><em>Para mais detalhes sobre parâmetros e respostas, consulte a documentação técnica ou teste diretamente os endpoints.</em></p>
-            </div>
-            
-            <div class="fuerza-card">
                 <h2>💡 Próximos Passos</h2>
                 <ul>
                     <li>Configure novos Custom Post Types conforme necessário</li>
