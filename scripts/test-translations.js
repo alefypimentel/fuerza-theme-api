@@ -43,6 +43,13 @@ async function testTranslations() {
           console.log(chalk.gray(`    Título: ${translation.titulo}`));
           console.log(chalk.gray(`    Slug: ${translation.slug}`));
           console.log(chalk.gray(`    Status: ${translation.status}`));
+
+          // Verificar dados de SEO
+          if (translation.seo && Object.keys(translation.seo).length > 0) {
+            console.log(chalk.gray(`    SEO: ${Object.keys(translation.seo).length} campos`));
+          } else {
+            console.log(chalk.gray(`    SEO: Nenhum dado configurado`));
+          }
         });
       } else {
         console.log(chalk.yellow('\n⚠️  Nenhuma tradução encontrada'));
@@ -87,6 +94,13 @@ async function testTranslations() {
           console.log(chalk.gray(`    Título: ${translation.titulo}`));
           console.log(chalk.gray(`    Slug: ${translation.slug}`));
           console.log(chalk.gray(`    Status: ${translation.status}`));
+
+          // Verificar dados de SEO
+          if (translation.seo && Object.keys(translation.seo).length > 0) {
+            console.log(chalk.gray(`    SEO: ${Object.keys(translation.seo).length} campos`));
+          } else {
+            console.log(chalk.gray(`    SEO: Nenhum dado configurado`));
+          }
         });
       } else {
         console.log(chalk.yellow('\n⚠️  Nenhuma tradução encontrada'));

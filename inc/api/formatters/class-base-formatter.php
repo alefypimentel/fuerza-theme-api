@@ -124,6 +124,9 @@ class Base_Formatter {
                         
                         if ($translated_acf_fields) {
                             $acf_translations[$lang] = self::process_acf_fields($translated_acf_fields);
+                            
+                            // Adicionar dados de SEO para esta tradução
+                            $acf_translations[$lang]['seo'] = self::format_seo_data($translation_id);
                         }
                     }
                     
@@ -256,6 +259,9 @@ class Base_Formatter {
             'tipo' => get_post_type($post_id),
         ];
         
+        // Adicionar dados de SEO se disponível
+        $data['seo'] = self::format_seo_data($post_id);
+        
         // Adicionar informações de tradução se disponível
         $data = self::add_translation_data($data, $post_id);
         
@@ -266,6 +272,59 @@ class Base_Formatter {
         }
         
         return $data;
+    }
+    
+    /**
+     * Formatar dados de SEO do Yoast
+     */
+    protected static function format_seo_data($post_id) {
+        $seo_data = [];
+        
+        // Verificar se o Yoast SEO está ativo
+        if (!defined('WPSEO_VERSION')) {
+            return $seo_data;
+        }
+        
+        // Dados básicos de SEO
+        $seo_data['title'] = get_post_meta($post_id, '_yoast_wpseo_title', true);
+        $seo_data['meta_description'] = get_post_meta($post_id, '_yoast_wpseo_metadesc', true);
+        $seo_data['focus_keyword'] = get_post_meta($post_id, '_yoast_wpseo_focuskw', true);
+        $seo_data['meta_robots_noindex'] = get_post_meta($post_id, '_yoast_wpseo_meta-robots-noindex', true);
+        $seo_data['meta_robots_nofollow'] = get_post_meta($post_id, '_yoast_wpseo_meta-robots-nofollow', true);
+        $seo_data['meta_robots_adv'] = get_post_meta($post_id, '_yoast_wpseo_meta-robots-adv', true);
+        
+        // Dados de Open Graph
+        $seo_data['opengraph_title'] = get_post_meta($post_id, '_yoast_wpseo_opengraph-title', true);
+        $seo_data['opengraph_description'] = get_post_meta($post_id, '_yoast_wpseo_opengraph-description', true);
+        $seo_data['opengraph_image'] = get_post_meta($post_id, '_yoast_wpseo_opengraph-image', true);
+        $seo_data['opengraph_image_id'] = get_post_meta($post_id, '_yoast_wpseo_opengraph-image-id', true);
+        
+        // Dados de Twitter Card
+        $seo_data['twitter_title'] = get_post_meta($post_id, '_yoast_wpseo_twitter-title', true);
+        $seo_data['twitter_description'] = get_post_meta($post_id, '_yoast_wpseo_twitter-description', true);
+        $seo_data['twitter_image'] = get_post_meta($post_id, '_yoast_wpseo_twitter-image', true);
+        $seo_data['twitter_image_id'] = get_post_meta($post_id, '_yoast_wpseo_twitter-image-id', true);
+        
+        // Dados de Schema
+        $seo_data['schema_page_type'] = get_post_meta($post_id, '_yoast_wpseo_schema_page_type', true);
+        $seo_data['schema_article_type'] = get_post_meta($post_id, '_yoast_wpseo_schema_article_type', true);
+        
+        // Dados de análise
+        $seo_data['linkdex'] = get_post_meta($post_id, '_yoast_wpseo_linkdex', true);
+        $seo_data['content_score'] = get_post_meta($post_id, '_yoast_wpseo_content_score', true);
+        
+        // Canonical URL
+        $seo_data['canonical'] = get_post_meta($post_id, '_yoast_wpseo_canonical', true);
+        
+        // Breadcrumbs
+        $seo_data['breadcrumbs_title'] = get_post_meta($post_id, '_yoast_wpseo_bctitle', true);
+        
+        // Remover campos vazios
+        $seo_data = array_filter($seo_data, function($value) {
+            return $value !== '' && $value !== null && $value !== false;
+        });
+        
+        return $seo_data;
     }
     
     /**
@@ -306,7 +365,8 @@ class Base_Formatter {
                         'slug' => $translated_post->post_name,
                         'link' => get_permalink($translation_id),
                         'status' => get_post_status($translation_id),
-                        'tipo' => get_post_type($translation_id)
+                        'tipo' => get_post_type($translation_id),
+                        'seo' => self::format_seo_data($translation_id)
                     ];
                 }
             }
