@@ -26,7 +26,6 @@ class Evento_Handler {
         $categoria = $request->get_param('categoria');
         $busca = $request->get_param('busca');
         $lang = $request->get_param('lang');
-        $include_translations = $request->get_param('include_translations');
 
         // Montar argumentos da query
         $args = [
@@ -65,12 +64,6 @@ class Evento_Handler {
                 
                 // Aplicar filtros de tradução aos dados formatados
                 $formatted_post = apply_filters('fuerza_api_format_post', $formatted_post, get_post());
-                
-                // Controlar inclusão de conteúdo traduzido
-                if ($include_translations !== 'full') {
-                    // Remove conteúdo completo das traduções se não solicitado
-                    unset($formatted_post['translated_content']);
-                }
                 
                 $items[] = $formatted_post;
             }
@@ -121,18 +114,10 @@ class Evento_Handler {
             return new WP_Error('evento_not_found', 'Evento não encontrado', ['status' => 404]);
         }
         
-        $include_translations = $request->get_param('include_translations');
-        
         $formatted_data = Evento_Formatter::format_evento($id);
         
         // Aplicar filtros de tradução
         $formatted_data = apply_filters('fuerza_api_format_post', $formatted_data, $item);
-        
-        // Controlar inclusão de conteúdo traduzido
-        if ($include_translations !== 'full') {
-            // Remove conteúdo completo das traduções se não solicitado
-            unset($formatted_data['translated_content']);
-        }
         
         return $formatted_data;
     }
@@ -168,12 +153,6 @@ class Evento_Handler {
                 'sanitize_callback' => 'sanitize_text_field',
                 'description' => 'Código do idioma (ex: pt, en, es)',
             ],
-            'include_translations' => [
-                'sanitize_callback' => 'sanitize_text_field',
-                'description' => 'Incluir conteúdo completo das traduções (full) ou apenas links (links)',
-                'default' => 'full',
-                'enum' => ['full', 'links']
-            ],
         ];
     }
     
@@ -185,12 +164,6 @@ class Evento_Handler {
             'id' => [
                 'required' => true,
                 'sanitize_callback' => 'absint',
-            ],
-            'include_translations' => [
-                'sanitize_callback' => 'sanitize_text_field',
-                'description' => 'Incluir conteúdo completo das traduções (full) ou apenas links (links)',
-                'default' => 'full',
-                'enum' => ['full', 'links']
             ],
         ];
     }

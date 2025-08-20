@@ -107,7 +107,34 @@ class Base_Formatter {
         }
 
         // Processar campos para formatar adequadamente
-        return self::process_acf_fields($campos);
+        $campos_processados = self::process_acf_fields($campos);
+        
+        // Adicionar traduções dos campos ACF se disponível
+        if (class_exists('Fuerza_Translation_Support')) {
+            $translation_support = Fuerza_Translation_Support::get_instance();
+            if ($translation_support->has_translation_plugin()) {
+                $translations = $translation_support->get_post_translations($post_id);
+                
+                if (!empty($translations)) {
+                    $acf_translations = [];
+                    
+                    foreach ($translations as $lang => $translation) {
+                        $translation_id = $translation['id'];
+                        $translated_acf_fields = get_fields($translation_id);
+                        
+                        if ($translated_acf_fields) {
+                            $acf_translations[$lang] = self::process_acf_fields($translated_acf_fields);
+                        }
+                    }
+                    
+                    if (!empty($acf_translations)) {
+                        $campos_processados['translations'] = $acf_translations;
+                    }
+                }
+            }
+        }
+
+        return $campos_processados;
     }
     
     /**
@@ -271,30 +298,29 @@ class Base_Formatter {
                 
                 if ($translated_post && $translated_post->post_status === 'publish') {
                     $translated_content[$lang] = [
-                        'id' => $translation_id,
-                        'language' => $lang,
                         'titulo' => get_the_title($translation_id),
                         'conteudo' => apply_filters('the_content', $translated_post->post_content),
                         'resumo' => get_the_excerpt($translated_post),
-                        'slug' => $translated_post->post_name,
-                        'url' => get_permalink($translation_id),
-                        'api_url' => home_url('/wp-json/' . API_Manager::get_namespace() . '/' . get_post_type($post_id) . '/' . $translation_id),
                         'data_publicacao' => get_the_date('Y-m-d H:i:s', $translation_id),
-                        'data_modificacao' => get_the_modified_date('Y-m-d H:i:s', $translation_id)
+                        'data_modificacao' => get_the_modified_date('Y-m-d H:i:s', $translation_id),
+                        'slug' => $translated_post->post_name,
+                        'link' => get_permalink($translation_id),
+                        'status' => get_post_status($translation_id),
+                        'tipo' => get_post_type($translation_id)
                     ];
                 }
             }
             
-            $data['translated_content'] = $translated_content;
+            $data['translations'] = $translated_content;
             
             // Manter translated_versions para compatibilidade (deprecado)
             $translated_urls = [];
             foreach ($data['translations'] as $lang => $translation) {
                 $translated_urls[$lang] = [
-                    'id' => $translation['id'],
-                    'url' => $translation['url'],
+                    'id' => $translation['id'] ?? 0,
+                    'url' => $translation['link'] ?? '',
                     'language' => $lang,
-                    'api_url' => home_url('/wp-json/' . API_Manager::get_namespace() . '/' . get_post_type($post_id) . '/' . $translation['id'])
+                    'api_url' => home_url('/wp-json/' . API_Manager::get_namespace() . '/' . get_post_type($post_id) . '/' . ($translation['id'] ?? 0))
                 ];
             }
             $data['translated_versions'] = $translated_urls;

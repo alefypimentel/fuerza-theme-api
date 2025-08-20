@@ -77,7 +77,7 @@ class Fuerza_Translation_Support {
         }
         
         // Obter idiomas disponíveis
-        $this->available_languages = icl_get_languages('skip_missing=0');
+        $this->available_languages = apply_filters('wpml_active_languages', null, 'orderby=id&order=desc');
         $this->default_language = $sitepress->get_default_language();
         
         // Configurar CPTs para tradução automática
@@ -85,7 +85,7 @@ class Fuerza_Translation_Support {
         
         // Filtros para API
         add_filter('fuerza_api_get_posts_args', [$this, 'wpml_filter_posts_args'], 10, 2);
-        add_filter('fuerza_api_format_post', [$this, 'wpml_add_translation_info'], 10, 2);
+        add_filter('fuerza_api_format_post', [$this, 'wpml_add_translation_info'], 20, 2);
     }
     
     /**
@@ -108,7 +108,7 @@ class Fuerza_Translation_Support {
         
         // Filtros para API
         add_filter('fuerza_api_get_posts_args', [$this, 'polylang_filter_posts_args'], 10, 2);
-        add_filter('fuerza_api_format_post', [$this, 'polylang_add_translation_info'], 10, 2);
+        add_filter('fuerza_api_format_post', [$this, 'polylang_add_translation_info'], 20, 2);
     }
     
     /**
@@ -277,8 +277,15 @@ class Fuerza_Translation_Support {
             return $post_data;
         }
         
-        $post_data['language'] = $this->get_post_language($post);
-        $post_data['translations'] = $this->get_post_translations($post);
+        // Apenas adicionar informações básicas se não existirem
+        if (!isset($post_data['language'])) {
+            $post_data['language'] = $this->get_post_language($post);
+        }
+        
+        // Não sobrescrever traduções já formatadas
+        if (!isset($post_data['translations'])) {
+            $post_data['translations'] = $this->get_post_translations($post);
+        }
         
         return $post_data;
     }
@@ -291,8 +298,15 @@ class Fuerza_Translation_Support {
             return $post_data;
         }
         
-        $post_data['language'] = $this->get_post_language($post);
-        $post_data['translations'] = $this->get_post_translations($post);
+        // Apenas adicionar informações básicas se não existirem
+        if (!isset($post_data['language'])) {
+            $post_data['language'] = $this->get_post_language($post);
+        }
+        
+        // Não sobrescrever traduções já formatadas
+        if (!isset($post_data['translations'])) {
+            $post_data['translations'] = $this->get_post_translations($post);
+        }
         
         return $post_data;
     }
@@ -310,9 +324,14 @@ class Fuerza_Translation_Support {
         }
         
         if ($this->is_wpml_active()) {
-            return apply_filters('wpml_post_language_details', null, $post_id)['language_code'] ?? $this->default_language;
+            $language_details = apply_filters('wpml_post_language_details', null, $post_id);
+            if ($language_details && isset($language_details['language_code'])) {
+                return $language_details['language_code'];
+            }
+            return $this->default_language;
         } elseif ($this->is_polylang_active()) {
-            return pll_get_post_language($post_id) ?: $this->default_language;
+            $language = pll_get_post_language($post_id);
+            return $language ?: $this->default_language;
         }
         
         return $this->default_language;
@@ -333,16 +352,90 @@ class Fuerza_Translation_Support {
         $translations = [];
         
         if ($this->is_wpml_active()) {
+            // Método 1: Usar wpml_get_element_translations
             $wpml_translations = apply_filters('wpml_get_element_translations', null, $post_id, 'post_' . get_post_type($post_id));
             
-            if ($wpml_translations) {
+            if ($wpml_translations && is_array($wpml_translations)) {
                 foreach ($wpml_translations as $lang => $translation) {
-                    if ($translation->element_id != $post_id) {
+                    if (isset($translation->element_id) && $translation->element_id != $post_id) {
                         $translations[$lang] = [
                             'id' => $translation->element_id,
                             'language' => $lang,
                             'url' => get_permalink($translation->element_id)
                         ];
+                    }
+                }
+            }
+            
+            // Método 2: Usar TRID se o primeiro método falhar
+            if (empty($translations)) {
+                $post_type = get_post_type($post_id);
+                $trid = apply_filters('wpml_element_trid', null, $post_id, 'post_' . $post_type);
+                
+                if ($trid) {
+                    $element_translations = apply_filters('wpml_get_element_translations', null, $trid, 'post_' . $post_type);
+                    
+                    if ($element_translations) {
+                        foreach ($element_translations as $lang => $translation) {
+                            if (isset($translation->element_id) && $translation->element_id != $post_id) {
+                                $translations[$lang] = [
+                                    'id' => $translation->element_id,
+                                    'language' => $lang,
+                                    'url' => get_permalink($translation->element_id)
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Método 3: Usar wpml_object_id para cada idioma
+            if (empty($translations)) {
+                $wpml_languages = apply_filters('wpml_active_languages', null, 'orderby=id&order=desc');
+                if ($wpml_languages) {
+                    foreach ($wpml_languages as $lang_code => $lang_data) {
+                        if ($lang_code !== $this->get_post_language($post_id)) {
+                            $translation_id = apply_filters('wpml_object_id', $post_id, get_post_type($post_id), false, $lang_code);
+                            if ($translation_id && $translation_id != $post_id) {
+                                $translations[$lang_code] = [
+                                    'id' => $translation_id,
+                                    'language' => $lang_code,
+                                    'url' => get_permalink($translation_id)
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Método 4: Buscar diretamente na tabela icl_translations
+            if (empty($translations)) {
+                global $wpdb;
+                $post_type = get_post_type($post_id);
+                
+                // Obter TRID da tabela icl_translations
+                $trid = $wpdb->get_var($wpdb->prepare(
+                    "SELECT trid FROM {$wpdb->prefix}icl_translations 
+                     WHERE element_id = %d AND element_type = %s",
+                    $post_id, 'post_' . $post_type
+                ));
+                
+                if ($trid) {
+                    // Buscar todas as traduções com o mesmo TRID
+                    $translation_rows = $wpdb->get_results($wpdb->prepare(
+                        "SELECT element_id, language_code FROM {$wpdb->prefix}icl_translations 
+                         WHERE trid = %d AND element_id != %d AND element_type = %s",
+                        $trid, $post_id, 'post_' . $post_type
+                    ));
+                    
+                    foreach ($translation_rows as $row) {
+                        if ($row->element_id && get_post_status($row->element_id) === 'publish') {
+                            $translations[$row->language_code] = [
+                                'id' => $row->element_id,
+                                'language' => $row->language_code,
+                                'url' => get_permalink($row->element_id)
+                            ];
+                        }
                     }
                 }
             }
@@ -447,9 +540,22 @@ class Fuerza_Translation_Support {
      * Obter todas as informações de tradução
      */
     public function get_translation_info() {
+        $languages = [];
+        
+        if ($this->is_wpml_active()) {
+            $wpml_languages = apply_filters('wpml_active_languages', null, 'orderby=id&order=desc');
+            if ($wpml_languages) {
+                foreach ($wpml_languages as $lang_code => $lang_data) {
+                    $languages[$lang_code] = $lang_data;
+                }
+            }
+        } elseif ($this->is_polylang_active()) {
+            $languages = $this->available_languages;
+        }
+        
         return [
             'plugin' => $this->active_plugin,
-            'languages' => $this->available_languages,
+            'languages' => $languages,
             'default_language' => $this->default_language,
             'current_language' => $this->get_current_language()
         ];
